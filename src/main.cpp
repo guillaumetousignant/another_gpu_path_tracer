@@ -22,7 +22,7 @@ int main() {
 	cgh.parallel_for<class FillBuffer>(
 		NumOfWorkItems, [=](cl::sycl::id<2> WIid) {
 	    	// Fill buffer with indexes
-	        Accessor[WIid] = Vec3<double>(WIid.get(0), WIid.get(1), 0);
+	        Accessor[WIid] = Vec3<double>(WIid.get(0), WIid.get(1), WIid.get(0) * WIid.get(1));
 		});
 	});
 
@@ -34,9 +34,9 @@ int main() {
 	bool MismatchFound = false;
 	for (size_t i = 0; i < Buffer.get_range()[0]; ++i) {
 		for (size_t j = 0; j < Buffer.get_range()[1]; ++j) {
-			if (HostAccessor[i][j].x() != double(i) || HostAccessor[i][j].y() != double(j) || HostAccessor[i][j].z() != 0.0) {
+			if (HostAccessor[i][j].x() != double(i) || HostAccessor[i][j].y() != double(j) || HostAccessor[i][j].z() != i * j) {
 				std::cout << "The result is incorrect for element: (" << i << ", " << j
-						<< "), expected: " << Vec3<double>(i, j, 0) << " , got: " << HostAccessor[i][j]
+						<< "), expected: " << Vec3<double>(i, j, i * j) << " , got: " << HostAccessor[i][j]
 						<< std::endl;
 				MismatchFound = true;
 			}
