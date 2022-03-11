@@ -25,18 +25,8 @@ endif()
 add_executable(SYCL-APP 
     main.cpp)
 
-target_link_directories(SYCL-APP PRIVATE $ENV{SYCL_LINK_DIR})
 target_link_libraries(SYCL-APP PRIVATE 
-                                SYCL-TEST-LIBRARY
-                                sycl)
-
-if (BUILD_CUDA)
-    target_compile_options(SYCL-APP PRIVATE -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
-    target_link_options(SYCL-APP PRIVATE -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
-else()
-    target_compile_options(SYCL-APP PRIVATE -fsycl)
-    target_link_options(SYCL-APP PRIVATE -fsycl)
-endif()
+                                SYCL-TEST-LIBRARY)
 
 target_compile_features(SYCL-APP PRIVATE cxx_std_20)
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
