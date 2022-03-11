@@ -6,6 +6,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif()
 
 option(BUILD_CUDA "Build CUDA version of the targets." ON)
+option(USE_hipSYCL "Use the hipSYCL backend." OFF)
+option(USE_clangSYCL "Use the Intel clang SYCL backend." ON)
 
 project(SYCL_TEST VERSION 1.0.0 LANGUAGES CXX C)
 
