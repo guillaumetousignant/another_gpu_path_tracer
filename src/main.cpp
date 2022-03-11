@@ -6,7 +6,7 @@ using APTracer::Entities::Vec3;
 
 int main() {
 	// Creating buffer of 4 ints to be used inside the kernel code
-	cl::sycl::buffer<Vec3<double>, 2> Buffer(cl::sycl::range<2>{1024, 1024});
+	cl::sycl::buffer<Vec3<double>, 2> Buffer(cl::sycl::range<2>{16384, 16384});
 
 	// Creating SYCL queue
 	cl::sycl::queue Queue;
