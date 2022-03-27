@@ -441,3 +441,34 @@ template <typename T>
 constexpr auto AGPTracer::Entities::Vec3<T>::b() -> T& {
     return v_[2];
 }
+
+template <typename T>
+constexpr auto AGPTracer::Entities::Vec3<T>::almost_equal(const Vec3<T> &other) const -> bool {
+    constexpr int ulp = 2; // ULP
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return (std::abs(v_[0] - other.v_[0]) <= std::numeric_limits<T>::epsilon() * std::abs(v_[0] + other.v_[0]) * ulp
+        // unless the result is subnormal
+        || std::abs(v_[0] - other.v_[0]) < std::numeric_limits<T>::min()) 
+        
+        && (std::abs(v_[1] - other.v_[1]) <= std::numeric_limits<T>::epsilon() * std::abs(v_[1] + other.v_[1]) * ulp
+        || std::abs(v_[1] - other.v_[1]) < std::numeric_limits<T>::min())
+        
+        && (std::abs(v_[2] - other.v_[2]) <= std::numeric_limits<T>::epsilon() * std::abs(v_[2] + other.v_[2]) * ulp
+        || std::abs(v_[2] - other.v_[2]) < std::numeric_limits<T>::min());
+}
+
+template <typename T>
+constexpr auto AGPTracer::Entities::Vec3<T>::almost_equal(const Vec3<T> &other, const int ulp) const -> bool {
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return (std::abs(v_[0] - other.v_[0]) <= std::numeric_limits<T>::epsilon() * std::abs(v_[0] + other.v_[0]) * ulp
+        // unless the result is subnormal
+        || std::abs(v_[0] - other.v_[0]) < std::numeric_limits<T>::min()) 
+        
+        && (std::abs(v_[1] - other.v_[1]) <= std::numeric_limits<T>::epsilon() * std::abs(v_[1] + other.v_[1]) * ulp
+        || std::abs(v_[1] - other.v_[1]) < std::numeric_limits<T>::min())
+        
+        && (std::abs(v_[2] - other.v_[2]) <= std::numeric_limits<T>::epsilon() * std::abs(v_[2] + other.v_[2]) * ulp
+        || std::abs(v_[2] - other.v_[2]) < std::numeric_limits<T>::min());
+}

@@ -638,6 +638,27 @@ namespace AGPTracer { namespace Entities {
              * @return T Reference to the blue component of the vector.
              */
             constexpr auto b() -> T&;
+
+            /**
+             * @brief Tests approximate equality between two vectors.
+             *
+             * Tests equality to two significant digits.
+             * 
+             * @param other Vector used to test approximate equality.
+             * @return true All two components of the vectors are approximately equal.
+             * @return false At least one component of the vectors is not approximately equal.
+             */
+            constexpr auto almost_equal(const Vec3<T> &other) const -> bool;
+
+            /**
+             * @brief Tests approximate equality between two vectors to a certain precision.
+             * 
+             * @param other Vector used to test approximate equality.
+             * @param ulp Precision of the equality, higher is higher acceptable difference.
+             * @return true All two components of the vectors are approximately equal.
+             * @return false At least one component of the vectors is not approximately equal.
+             */
+            constexpr auto almost_equal(const Vec3<T> &other, const int ulp) const -> bool;
     };
 }}
 
