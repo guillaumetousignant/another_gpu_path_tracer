@@ -49,7 +49,7 @@ auto check_results(cl::sycl::buffer<Triangle_t, 1>& buffer) -> bool {
 }
 
 auto main() -> int {
-	// Creating buffer of 4 ints to be used inside the kernel code
+	// Creating buffer of triangles to be used inside the kernel code
 	cl::sycl::buffer<Triangle_t, 1> triangle_buffer(cl::sycl::range<1>{12});
 
     fill_triangles(triangle_buffer);
