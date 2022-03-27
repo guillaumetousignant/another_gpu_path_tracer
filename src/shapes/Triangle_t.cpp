@@ -9,9 +9,10 @@ using AGPTracer::Entities::Vec3;
 AGPTracer::Shapes::Triangle_t::Triangle_t(/*AGPTracer::Entities::Material_t *material,*/ std::array<Vec3<double>, 3> points, const std::optional<std::array<Vec3<double>, 3>> normals, const std::optional<std::array<double, 6>> texcoord) 
     : points_orig_{points} {
 
-    normals_orig_ = normals.value_or((points_orig_[1] - points_orig_[0]).cross(points_orig_[2] - points_orig_[0]).normalize_inplace());
+    const Vec3<double> nor = (points_orig_[1] - points_orig_[0]).cross(points_orig_[2] - points_orig_[0]).normalize_inplace();
+    normals_orig_ = normals.value_or(std::array<Vec3<double>, 3>{nor, nor, nor});
 
-    texture_coordinates_ = texcoord.value_or({0, 1, 0, 0, 1, 0});
+    texture_coordinates_ = texcoord.value_or(std::array<double, 6>{0, 1, 0, 0, 1, 0});
 
     points_ = {transformation_.multVec(points_orig_[0]),
                transformation_.multVec(points_orig_[1]),

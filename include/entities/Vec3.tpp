@@ -192,7 +192,7 @@ constexpr auto AGPTracer::Entities::Vec3<T>::max(T2 other) -> Vec3<T>& {
 
 template <typename T>
 template <class T2>
-constexpr auto AGPTracer::Entities::Vec3<T>::getMin(const Vec3<T2> &other) const -> Vec3<decltype(std::min(std::declval<T>(), std::declval<T2>()))> {
+constexpr auto AGPTracer::Entities::Vec3<T>::getMin(const Vec3<T2> &other) const -> Vec3<typename std::remove_const<typename std::remove_reference<decltype(std::min(std::declval<T>(), std::declval<T2>()))>::type>::type> {
     return {std::min(v_[0], other[0]), std::min(v_[1], other[1]), std::min(v_[2], other[2])};
 }
 
@@ -204,7 +204,7 @@ constexpr auto AGPTracer::Entities::Vec3<T>::getMin(T2 other) const -> Vec3<decl
 
 template <typename T>
 template <class T2>
-constexpr auto AGPTracer::Entities::Vec3<T>::getMax(const Vec3<T2> &other) const -> Vec3<decltype(std::max(std::declval<T>(), std::declval<T2>()))> {
+constexpr auto AGPTracer::Entities::Vec3<T>::getMax(const Vec3<T2> &other) const -> Vec3<typename std::remove_const<typename std::remove_reference<decltype(std::max(std::declval<T>(), std::declval<T2>()))>::type>::type> {
     return {std::max(v_[0], other[0]), std::max(v_[1], other[1]), std::max(v_[2], other[2])};
 }
 

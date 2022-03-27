@@ -313,7 +313,7 @@ namespace AGPTracer { namespace Entities {
              * @return Vec3 Reference to the vector, used to chain operations.
              */
             template <class T2>
-            constexpr auto getMin(const Vec3<T2> &other) const -> Vec3<decltype(std::min(std::declval<T>(), std::declval<T2>()))>;
+            constexpr auto getMin(const Vec3<T2> &other) const -> Vec3<typename std::remove_const<typename std::remove_reference<decltype(std::min(std::declval<T>(), std::declval<T2>()))>::type>::type>;
 
             /**
              * @brief Returns a vector with the minimum components of this vector and a factor.
@@ -335,7 +335,7 @@ namespace AGPTracer { namespace Entities {
              * @return Vec3 Reference to the vector, used to chain operations.
              */
             template <class T2>
-            constexpr auto getMax(const Vec3<T2> &other) const -> Vec3<decltype(std::max(std::declval<T>(), std::declval<T2>()))>;
+            constexpr auto getMax(const Vec3<T2> &other) const -> Vec3<typename std::remove_const<typename std::remove_reference<decltype(std::max(std::declval<T>(), std::declval<T2>()))>::type>::type>;
 
             /**
              * @brief Returns a vector with the maximum components of this vector and a factor.
