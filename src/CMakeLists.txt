@@ -1,6 +1,7 @@
 add_library(AGPTracer "")
 
 add_subdirectory(entities)
+add_subdirectory(shapes)
 
 target_include_directories(AGPTracer PUBLIC 
     $<INSTALL_INTERFACE:include/SYCL-APP/>    
