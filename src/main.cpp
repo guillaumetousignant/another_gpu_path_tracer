@@ -1,6 +1,7 @@
 #include <CL/sycl.hpp>
 #include "entities/Ray_t.h"
 #include "entities/Vec3.h"
+#include "shapes/Triangle_t.h"
 
 using AGPTracer::Entities::Vec3;
 
