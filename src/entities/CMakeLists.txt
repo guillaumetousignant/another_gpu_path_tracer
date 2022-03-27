@@ -1,4 +1,4 @@
-target_sources(SYCL-TEST-LIBRARY
+target_sources(AGPTracer
     PRIVATE
         Ray_t.cpp
         TransformMatrix_t.cpp

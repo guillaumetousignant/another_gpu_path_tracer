@@ -1,11 +1,11 @@
-#ifndef APTRACER_ENTITIES_TRANSFORMMATRIX_T_H
-#define APTRACER_ENTITIES_TRANSFORMMATRIX_T_H
+#ifndef AGPTRACER_ENTITIES_TRANSFORMMATRIX_T_H
+#define AGPTRACER_ENTITIES_TRANSFORMMATRIX_T_H
 
 #include "entities/Vec3.h"
 #include <cmath>
 #include <array>
 
-namespace APTracer { namespace Entities {
+namespace AGPTracer { namespace Entities {
     
     /**
      * @brief The transformation matrix class represents a 4x4 3D transformation matrix, used to transform other objects in 3D space.

@@ -5,12 +5,12 @@
 //#include "entities/Skybox_t.h"
 //#include "entities/Shape_t.h"
 
-using APTracer::Entities::Ray_t;
-using APTracer::Entities::Vec3;
-//using APTracer::Entities::Medium_t;
-//using APTracer::Entities::Skybox_t;
-//using APTracer::Entities::Scene_t;
-//using APTracer::Entities::Shape_t;
+using AGPTracer::Entities::Ray_t;
+using AGPTracer::Entities::Vec3;
+//using AGPTracer::Entities::Medium_t;
+//using AGPTracer::Entities::Skybox_t;
+//using AGPTracer::Entities::Scene_t;
+//using AGPTracer::Entities::Shape_t;
 
 Ray_t::Ray_t(const Vec3<double> &origin, const Vec3<double> &direction, const Vec3<double> &colour, const Vec3<double> &mask) : //, std::list<Medium_t*> medium_list) : 
     origin_(origin), direction_(direction), colour_(colour), mask_(mask), dist_(0.0), time_(1.0) {} //, medium_list_(std::move(medium_list)), time_(1.0) {}

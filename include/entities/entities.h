@@ -1,6 +1,6 @@
-#ifndef APTRACER_ENTITIES_ENTITIES_H
-#define APTRACER_ENTITIES_ENTITIES_H
-namespace APTracer { 
+#ifndef AGPTRACER_ENTITIES_ENTITIES_H
+#define AGPTRACER_ENTITIES_ENTITIES_H
+namespace AGPTracer { 
     /**
      * @brief Contains the fundamental types of the project. 
      * 

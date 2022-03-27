@@ -2,7 +2,7 @@
 #include "entities/Ray_t.h"
 #include "entities/Vec3.h"
 
-using APTracer::Entities::Vec3;
+using AGPTracer::Entities::Vec3;
 
 int main() {
 	// Creating buffer of 4 ints to be used inside the kernel code

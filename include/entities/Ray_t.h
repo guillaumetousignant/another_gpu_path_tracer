@@ -1,10 +1,10 @@
-#ifndef APTRACER_ENTITIES_RAY_T_H
-#define APTRACER_ENTITIES_RAY_T_H
+#ifndef AGPTRACER_ENTITIES_RAY_T_H
+#define AGPTRACER_ENTITIES_RAY_T_H
 
 #include "entities/Vec3.h"
 #include <list>
 
-namespace APTracer { namespace Entities {
+namespace AGPTracer { namespace Entities {
     //class Medium_t;
     //class Scene_t;
     //class Skybox_t;

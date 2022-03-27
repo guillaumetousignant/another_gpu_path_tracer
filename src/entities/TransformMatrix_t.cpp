@@ -1,8 +1,8 @@
 #include "entities/TransformMatrix_t.h"
 #include <algorithm>
 
-using APTracer::Entities::TransformMatrix_t;
-using APTracer::Entities::Vec3;
+using AGPTracer::Entities::TransformMatrix_t;
+using AGPTracer::Entities::Vec3;
 
 TransformMatrix_t::TransformMatrix_t() : matrix_{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1} {
     buildInverse();
