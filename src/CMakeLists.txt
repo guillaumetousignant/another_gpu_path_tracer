@@ -31,7 +31,7 @@ if(USE_clangSYCL)
 endif()
 
 target_compile_features(AGPTracer PRIVATE cxx_std_20)
-if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     set_property(TARGET AGPTracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif()
 
@@ -42,6 +42,6 @@ target_link_libraries(another_gpu_path_tracer PRIVATE
                                                 AGPTracer)
 
 target_compile_features(another_gpu_path_tracer PRIVATE cxx_std_20)
-if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     set_property(TARGET another_gpu_path_tracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif()
