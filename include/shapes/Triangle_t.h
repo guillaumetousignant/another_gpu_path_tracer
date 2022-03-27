@@ -6,6 +6,7 @@
 #include "entities/TransformMatrix_t.h"
 #include <array>
 #include <optional>
+#include <CL/sycl.hpp>
 
 namespace AGPTracer { namespace Entities {
     //class Material_t;
@@ -42,6 +43,7 @@ namespace AGPTracer { namespace Shapes {
             std::array<double, 2> tuv_to_world_; /**< @brief Matrix to change referential from texture coordinate space to world space. Used to compute tangent vector.*/
             AGPTracer::Entities::Vec3<double> tangent_vec_; /**< @brief Tangent vector of the triangle in world space. Points to positive u in texture coordinates. Used for normal mapping.*/
 
+            SYCL_EXTERNAL
             /**
              * @brief Updates the triangle's points from its transformation matrix.
              * 
@@ -49,6 +51,7 @@ namespace AGPTracer { namespace Shapes {
              */
             auto update() -> void;
 
+            SYCL_EXTERNAL
             /**
              * @brief Intersects a ray with the triangle, and stores information about the intersection.
              * 
@@ -64,6 +67,7 @@ namespace AGPTracer { namespace Shapes {
              */
             auto intersection(const AGPTracer::Entities::Ray_t &ray, double &t, std::array<double, 2> &uv) const -> bool; 
 
+            SYCL_EXTERNAL
             /**
              * @brief Returns the surface normal and texture coordinates at a point in object coordinates.
              * 
@@ -79,6 +83,7 @@ namespace AGPTracer { namespace Shapes {
              */
             auto normaluv(double time, std::array<double, 2> uv, std::array<double, 2> &tuv) const -> AGPTracer::Entities::Vec3<double>;
 
+            SYCL_EXTERNAL
             /**
              * @brief Returns the surface normal at a point in object coordinates.
              * 
@@ -92,6 +97,7 @@ namespace AGPTracer { namespace Shapes {
              */
             auto normal(double time, std::array<double, 2> uv) const -> AGPTracer::Entities::Vec3<double>;
 
+            SYCL_EXTERNAL
             /**
              * @brief Returns the surface normal, texture coordinates and tangent vector at a point in object coordinates.
              * 
@@ -109,6 +115,7 @@ namespace AGPTracer { namespace Shapes {
              */
             auto normal_uv_tangent(double time, std::array<double, 2> uv, std::array<double, 2> &tuv, AGPTracer::Entities::Vec3<double> &tangentvec) const -> AGPTracer::Entities::Vec3<double>;
 
+            SYCL_EXTERNAL
             /**
              * @brief Returns the geometric surface normal of the triangle, not the interpolated one from vertex normals.
              * 
@@ -119,6 +126,7 @@ namespace AGPTracer { namespace Shapes {
              */
             auto normal_face(double time) const -> AGPTracer::Entities::Vec3<double>;
 
+            SYCL_EXTERNAL
             /**
              * @brief Minimum coordinates of an axis-aligned bounding box around the triangle.
              * 
@@ -129,6 +137,7 @@ namespace AGPTracer { namespace Shapes {
              */
             auto mincoord() const -> AGPTracer::Entities::Vec3<double>;
 
+            SYCL_EXTERNAL
             /**
              * @brief Maximum coordinates of an axis-aligned bounding box around the triangle.
              * 

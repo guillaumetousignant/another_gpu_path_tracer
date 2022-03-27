@@ -1,4 +1,5 @@
 #include "entities/TransformMatrix_t.h"
+#include <cmath>
 #include <algorithm>
 
 using AGPTracer::Entities::TransformMatrix_t;
@@ -19,8 +20,8 @@ TransformMatrix_t::TransformMatrix_t(std::array<double, 16> values) : matrix_{va
 
 auto TransformMatrix_t::rotateXAxis(double angle) -> TransformMatrix_t& {
     const std::array<double, 16> other{1, 0, 0, 0,
-                                       0, cos(angle), sin(angle), 0,
-                                       0, -sin(angle), cos(angle), 0,
+                                       0, sycl::cos(angle), sycl::sin(angle), 0,
+                                       0, -sycl::sin(angle), sycl::cos(angle), 0,
                                        0, 0, 0, 1};
     const std::array<double, 16> matrix{matrix_};
 
@@ -38,9 +39,9 @@ auto TransformMatrix_t::rotateXAxis(double angle) -> TransformMatrix_t& {
 }
 
 auto TransformMatrix_t::rotateYAxis(double angle) -> TransformMatrix_t& {
-    const std::array<double, 16> other{cos(angle), 0, -sin(angle), 0,
+    const std::array<double, 16> other{sycl::cos(angle), 0, -sycl::sin(angle), 0,
                                        0, 1, 0, 0,
-                                       sin(angle), 0, cos(angle), 0,
+                                       sycl::sin(angle), 0, sycl::cos(angle), 0,
                                        0, 0, 0, 1};
     const std::array<double, 16> matrix{matrix_};
 
@@ -58,8 +59,8 @@ auto TransformMatrix_t::rotateYAxis(double angle) -> TransformMatrix_t& {
 }
 
 auto TransformMatrix_t::rotateZAxis(double angle) -> TransformMatrix_t& {
-    const std::array<double, 16> other{cos(angle), sin(angle), 0, 0,
-                                      -sin(angle), cos(angle), 0, 0,
+    const std::array<double, 16> other{sycl::cos(angle), sycl::sin(angle), 0, 0,
+                                      -sycl::sin(angle), sycl::cos(angle), 0, 0,
                                        0, 0, 1, 0,
                                        0, 0, 0, 1};
     const std::array<double, 16> matrix{matrix_};
@@ -79,9 +80,9 @@ auto TransformMatrix_t::rotateZAxis(double angle) -> TransformMatrix_t& {
 
 auto TransformMatrix_t::rotateX(double angle) -> TransformMatrix_t& {
     const std::array<double, 16> other{1, 0, 0, 0, /* Dunno if those work, pre-multiplied them*/
-                                       0, cos(angle), sin(angle), 0,
-                                       0, -sin(angle), cos(angle), 0,
-                                       0, matrix_[13] - matrix_[13]*cos(angle) + matrix_[14]*sin(angle), matrix_[14] - matrix_[14]*cos(angle) - matrix_[13]*sin(angle), 1};
+                                       0, sycl::cos(angle), sycl::sin(angle), 0,
+                                       0, -sycl::sin(angle), sycl::cos(angle), 0,
+                                       0, matrix_[13] - matrix_[13]*sycl::cos(angle) + matrix_[14]*sycl::sin(angle), matrix_[14] - matrix_[14]*sycl::cos(angle) - matrix_[13]*sycl::sin(angle), 1};
     const std::array<double, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -98,10 +99,10 @@ auto TransformMatrix_t::rotateX(double angle) -> TransformMatrix_t& {
 }
 
 auto TransformMatrix_t::rotateY(double angle) -> TransformMatrix_t& {
-    const std::array<double, 16> other{cos(angle), 0, -sin(angle), 0,
+    const std::array<double, 16> other{sycl::cos(angle), 0, -sycl::sin(angle), 0,
                                        0, 1, 0, 0,
-                                       sin(angle), 0, cos(angle), 0,
-                                       matrix_[12] - matrix_[12]*cos(angle) - matrix_[14]*sin(angle), 0, matrix_[14] - matrix_[14]*cos(angle) + matrix_[12]*sin(angle), 1};
+                                       sycl::sin(angle), 0, sycl::cos(angle), 0,
+                                       matrix_[12] - matrix_[12]*sycl::cos(angle) - matrix_[14]*sycl::sin(angle), 0, matrix_[14] - matrix_[14]*sycl::cos(angle) + matrix_[12]*sycl::sin(angle), 1};
     const std::array<double, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -118,10 +119,10 @@ auto TransformMatrix_t::rotateY(double angle) -> TransformMatrix_t& {
 }
 
 auto TransformMatrix_t::rotateZ(double angle) -> TransformMatrix_t& {
-    const std::array<double, 16> other{cos(angle), sin(angle), 0, 0,
-                                       -sin(angle), cos(angle), 0, 0,
+    const std::array<double, 16> other{sycl::cos(angle), sycl::sin(angle), 0, 0,
+                                       -sycl::sin(angle), sycl::cos(angle), 0, 0,
                                        0, 0, 1, 0,
-                                       matrix_[12] - matrix_[12]*cos(angle) + matrix_[13]*sin(angle), matrix_[13] - matrix_[13]*cos(angle) - matrix_[12]*sin(angle), 0, 1};
+                                       matrix_[12] - matrix_[12]*sycl::cos(angle) + matrix_[13]*sycl::sin(angle), matrix_[13] - matrix_[13]*sycl::cos(angle) - matrix_[12]*sycl::sin(angle), 0, 1};
     const std::array<double, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -139,9 +140,9 @@ auto TransformMatrix_t::rotateZ(double angle) -> TransformMatrix_t& {
 
 auto TransformMatrix_t::rotateAxis(const Vec3<double> &vec, double angle) -> TransformMatrix_t& {
     const Vec3<double> vec2 = vec.normalize(); // Dunno if needed
-    const std::array<double, 16> other{vec2[0] * vec2[0] * (1 - cos(angle)) + cos(angle), vec2[1] * vec2[0] * (1 - cos(angle)) - vec2[2] * sin(angle), vec2[2] * vec2[0] * (1 - cos(angle)) + vec2[1] * sin(angle), 0,
-                                       vec2[0] * vec2[1] * (1 - cos(angle)) + vec2[2] * sin(angle), vec2[1] * vec2[1] * (1 - cos(angle)) + cos(angle), vec2[2] * vec2[1] * (1 - cos(angle)) - vec2[0] * sin(angle), 0,
-                                       vec2[0] * vec2[2] * (1 - cos(angle)) - vec2[0] * sin(angle), vec2[0] * vec2[1] * (1 - cos(angle)) + vec2[0] * sin(angle), vec2[2] * vec2[2] * (1 - cos(angle)) + cos(angle), 0,
+    const std::array<double, 16> other{vec2[0] * vec2[0] * (1 - sycl::cos(angle)) + sycl::cos(angle), vec2[1] * vec2[0] * (1 - sycl::cos(angle)) - vec2[2] * sycl::sin(angle), vec2[2] * vec2[0] * (1 - sycl::cos(angle)) + vec2[1] * sycl::sin(angle), 0,
+                                       vec2[0] * vec2[1] * (1 - sycl::cos(angle)) + vec2[2] * sycl::sin(angle), vec2[1] * vec2[1] * (1 - sycl::cos(angle)) + sycl::cos(angle), vec2[2] * vec2[1] * (1 - sycl::cos(angle)) - vec2[0] * sycl::sin(angle), 0,
+                                       vec2[0] * vec2[2] * (1 - sycl::cos(angle)) - vec2[0] * sycl::sin(angle), vec2[0] * vec2[1] * (1 - sycl::cos(angle)) + vec2[0] * sycl::sin(angle), vec2[2] * vec2[2] * (1 - sycl::cos(angle)) + sycl::cos(angle), 0,
                                        0, 0, 0, 1};
     const std::array<double, 16> matrix{matrix_};
 
@@ -160,10 +161,10 @@ auto TransformMatrix_t::rotateAxis(const Vec3<double> &vec, double angle) -> Tra
 
 auto TransformMatrix_t::rotate(const Vec3<double> &vec, double angle) -> TransformMatrix_t& {
     const Vec3<double> vec2 = vec.normalize(); // Dunno if needed
-    const std::array<double, 16> other{vec2[0] * vec2[0] * (1 - cos(angle)) + cos(angle), vec2[1] * vec2[0] * (1 - cos(angle)) - vec2[2] * sin(angle), vec2[2] * vec2[0] * (1 - cos(angle)) + vec2[1] * sin(angle), 0,
-                                       vec2[0] * vec2[1] * (1 - cos(angle)) + vec2[2] * sin(angle), vec2[1] * vec2[1] * (1 - cos(angle)) + cos(angle), vec2[2] * vec2[1] * (1 - cos(angle)) - vec2[0] * sin(angle), 0,
-                                       vec2[0] * vec2[2] * (1 - cos(angle)) - vec2[0] * sin(angle), vec2[0] * vec2[1] * (1 - cos(angle)) + vec2[0] * sin(angle), vec2[2] * vec2[2] * (1 - cos(angle)) + cos(angle), 0,
-                                       matrix_[12] + matrix_[14]*(vec2[0]*sin(angle) + vec2[0]*vec2[2]*(cos(angle) - 1)) - matrix_[13]*(vec2[2]*sin(angle) - vec2[0]*vec2[1]*(cos(angle) - 1)) - matrix_[12]*((1 - cos(angle))*vec2[0]*vec2[0] + cos(angle)), matrix_[13] + matrix_[12]*(vec2[2]*sin(angle) + vec2[0]*vec2[1]*(cos(angle) - 1)) - matrix_[14]*(vec2[0]*sin(angle) - vec2[0]*vec2[1]*(cos(angle) - 1)) - matrix_[13]*((1 - cos(angle))*vec2[1]*vec2[1] + cos(angle)), matrix_[14] - matrix_[12]*(vec2[1]*sin(angle) - vec2[0]*vec2[2]*(cos(angle) - 1)) + matrix_[13]*(vec2[0]*sin(angle) + vec2[1]*vec2[2]*(cos(angle) - 1)) - matrix_[14]*((1 - cos(angle))*vec2[2]*vec2[2] + cos(angle)), 1};
+    const std::array<double, 16> other{vec2[0] * vec2[0] * (1 - sycl::cos(angle)) + sycl::cos(angle), vec2[1] * vec2[0] * (1 - sycl::cos(angle)) - vec2[2] * sycl::sin(angle), vec2[2] * vec2[0] * (1 - sycl::cos(angle)) + vec2[1] * sycl::sin(angle), 0,
+                                       vec2[0] * vec2[1] * (1 - sycl::cos(angle)) + vec2[2] * sycl::sin(angle), vec2[1] * vec2[1] * (1 - sycl::cos(angle)) + sycl::cos(angle), vec2[2] * vec2[1] * (1 - sycl::cos(angle)) - vec2[0] * sycl::sin(angle), 0,
+                                       vec2[0] * vec2[2] * (1 - sycl::cos(angle)) - vec2[0] * sycl::sin(angle), vec2[0] * vec2[1] * (1 - sycl::cos(angle)) + vec2[0] * sycl::sin(angle), vec2[2] * vec2[2] * (1 - sycl::cos(angle)) + sycl::cos(angle), 0,
+                                       matrix_[12] + matrix_[14]*(vec2[0]*sycl::sin(angle) + vec2[0]*vec2[2]*(sycl::cos(angle) - 1)) - matrix_[13]*(vec2[2]*sycl::sin(angle) - vec2[0]*vec2[1]*(sycl::cos(angle) - 1)) - matrix_[12]*((1 - sycl::cos(angle))*vec2[0]*vec2[0] + sycl::cos(angle)), matrix_[13] + matrix_[12]*(vec2[2]*sycl::sin(angle) + vec2[0]*vec2[1]*(sycl::cos(angle) - 1)) - matrix_[14]*(vec2[0]*sycl::sin(angle) - vec2[0]*vec2[1]*(sycl::cos(angle) - 1)) - matrix_[13]*((1 - sycl::cos(angle))*vec2[1]*vec2[1] + sycl::cos(angle)), matrix_[14] - matrix_[12]*(vec2[1]*sycl::sin(angle) - vec2[0]*vec2[2]*(sycl::cos(angle) - 1)) + matrix_[13]*(vec2[0]*sycl::sin(angle) + vec2[1]*vec2[2]*(sycl::cos(angle) - 1)) - matrix_[14]*((1 - sycl::cos(angle))*vec2[2]*vec2[2] + sycl::cos(angle)), 1};
                                     // Wow just wow, such a line to write. I assume this is super slow
     const std::array<double, 16> matrix{matrix_};
 

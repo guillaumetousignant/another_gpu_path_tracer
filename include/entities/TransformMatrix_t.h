@@ -2,8 +2,8 @@
 #define AGPTRACER_ENTITIES_TRANSFORMMATRIX_T_H
 
 #include "entities/Vec3.h"
-#include <cmath>
 #include <array>
+#include <CL/sycl.hpp>
 
 namespace AGPTracer { namespace Entities {
     
@@ -62,6 +62,7 @@ namespace AGPTracer { namespace Entities {
             std::array<double, 16> matrix_; /**< @brief Array of the 16 values in the 4x4 matrix.*/
             std::array<double, 16> matrix_inverse_; /**< @brief Transposed inverted matrix, used to transform directions.*/
 
+            SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix around the x axis by a specified angle in radians.
              * 
@@ -72,6 +73,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto rotateXAxis(double angle) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix around the x axis by a specified angle in radians.
              * 
@@ -82,6 +84,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto rotateYAxis(double angle) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix around the z axis by a specified angle in radians.
              * 
@@ -92,6 +95,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto rotateZAxis(double angle) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix on itself around the x direction.
              * 
@@ -102,6 +106,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto rotateX(double angle) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix on itself around the y direction.
              * 
@@ -112,6 +117,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto rotateY(double angle) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix on itself around the z direction.
              * 
@@ -122,6 +128,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto rotateZ(double angle) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix around an arbitrary axis by a specified angle in radians.
              * 
@@ -134,6 +141,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto rotateAxis(const Vec3<double> &vec, double angle) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix on itself around an arbitrary axis by a specified angle in radians.
              * 
@@ -146,6 +154,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto rotate(const Vec3<double> &vec, double angle) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Translates the matrix in 3D space.
              * 
@@ -154,6 +163,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto translate(const Vec3<double> &vec) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Scales the matrix from (0, 0, 0) by a three-component vector.
              * 
@@ -165,6 +175,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto scaleAxis(const Vec3<double> &vec) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Scales the matrix from (0, 0, 0) by a factor.
              * 
@@ -176,6 +187,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto scaleAxis(double fac) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Scales the matrix inplace by a three-component vector.
              * 
@@ -186,6 +198,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto scale(const Vec3<double> &vec) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Scales the matrix inplace by a factor.
              * 
@@ -196,6 +209,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto scale(double fac) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Reflects the matrix. Not implemented yet.
              * 
@@ -206,6 +220,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto reflect(const Vec3<double> &vec) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Shears the matrix. Not implemented yet.
              * 
@@ -216,6 +231,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto shear(const Vec3<double> &vec) -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Transposes the matrix.
              * 
@@ -223,6 +239,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto transpose() -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Inverts the matrix.
              * 
@@ -232,6 +249,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto invert() -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Negates the matrix.
              * 
@@ -239,6 +257,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto neg() -> TransformMatrix_t&;
 
+            SYCL_EXTERNAL
             /**
              * @brief Transforms a point with the matrix, moving it around according to the operations made on the matrix.
              * 
@@ -247,6 +266,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto multVec(const Vec3<double> &vec) const -> Vec3<double>;
 
+            SYCL_EXTERNAL
             /**
              * @brief Transforms a direction, rotating it according to the operations made on the matrix.
              * 
@@ -255,6 +275,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto multDir(const Vec3<double> &vec) const -> Vec3<double>;
 
+            SYCL_EXTERNAL
             /**
              * @brief Get the maximum scale of all three axis.
              * 
@@ -263,6 +284,7 @@ namespace AGPTracer { namespace Entities {
             auto getScale() const -> double;
 
         private:
+            SYCL_EXTERNAL
             /**
              * @brief Builds the transposed inverse matrix, to transform directions.
              * 
