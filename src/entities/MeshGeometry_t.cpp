@@ -129,7 +129,7 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> std::vect
                     pos = value.find('/');
                     if (pos == std::string::npos) {
                         v_[f_counter*3 + i] = v[std::stoi(value, nullptr)-1];
-                        vt_[f_counter*6 + i] = std::array<double>{0, 0};
+                        vt_[f_counter*6 + i] = std::array<double, 2>{0, 0};
                         vn_[f_counter*3 + i] = Vec3<double>(0.0);
                         missing_normals[f_counter*3 + i] = true;
                     }
@@ -145,7 +145,7 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> std::vect
                         }
                         else {
                             if (pos == 0) {
-                                vt_[f_counter*6 + i] = std::array<double>{0, 0};
+                                vt_[f_counter*6 + i] = std::array<double, 2>{0, 0};
                             }
                             else {
                                 vt_[f_counter*6 + i] = vt[std::stoi(value.substr(0, pos), nullptr) - 1];
@@ -303,7 +303,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> std::vect
                     liness >> tokens[i];
                     v_[3*f_counter + i] = v[tokens[i]];
                     mat_[f_counter] = material;
-                    vt_[6*f_counter + i] = std::array<double>{0, 0};
+                    vt_[6*f_counter + i] = std::array<double, 2>{0, 0};
                     vn_[3*f_counter + i] = Vec3<double>(0.0);
                 }
                 ++f_counter;
@@ -313,7 +313,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> std::vect
                     liness >> tokens[i];
                     v_[3*f_counter + i] = v[tokens[i]];
                     mat_[f_counter] = material;
-                    vt_[6*f_counter + i] = std::array<double>{0, 0};
+                    vt_[6*f_counter + i] = std::array<double, 2>{0, 0};
                     vn_[3*f_counter + i] = Vec3<double>(0.0);
                 }
                 ++f_counter;
@@ -322,7 +322,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> std::vect
                 for (unsigned int i = 0; i < 3; ++i) {
                     v_[3*f_counter + i] = v[tokens[i]];
                     mat_[f_counter] = material;
-                    vt_[6*f_counter + i] = std::array<double>{0, 0};
+                    vt_[6*f_counter + i] = std::array<double, 2>{0, 0};
                     vn_[3*f_counter + i] = Vec3<double>(0.0);
                 }
                 ++f_counter;
