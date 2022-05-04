@@ -31,7 +31,7 @@ namespace AGPTracer { namespace Entities {
             size_t n_tris_; /**< @brief Number of triangular faces held by the mesh geometry.*/
             std::vector<std::string> mat_; /**< @brief Array of strings representing each face's material's name. Size: n_tris_.*/
             std::vector<Vec3<double>> v_; /**< @brief Array of points representing the triangular faces. Size: 3*n_tris_. Face i has the points v_[3*i], v_[3*i + 1], v_[3*i + 2].*/
-            std::vector<double> vt_; /**< @brief Array of uv coordinates representing the triangular faces' texture coordinates. Size: 6*n_tris_. Face i has the uvs [vt_[6*i], vt_[6*i+1]], [vt_[6*i+2], vt_[6*i+3]], [vt_[6*i+4], vt_[6*i+5]].*/
+            std::vector<std::array<double, 2>> vt_; /**< @brief Array of 2D uv coordinates representing the triangular faces' texture coordinates. Size: 3*n_tris_. Face i has the uvs vt_[3*i], vt_[3*i + 1], vt_[3*i + 2].*/
             std::vector<Vec3<double>> vn_; /**< @brief Array of normals representing the triangular faces' normals. Size: 3*n_tris_. Face i has the normals vn_[3*i], vn_[3*i + 1], vn_[3*i + 2].*/
         
         private:
