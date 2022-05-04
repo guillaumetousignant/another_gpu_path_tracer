@@ -10,6 +10,7 @@ namespace AGPTracer {
     namespace Entities {}
 }
 
+#include "MeshGeometry_t.h"
 #include "Ray_t.h"
 #include "TransformMatrix_t.h"
 #include "Vec3.h"

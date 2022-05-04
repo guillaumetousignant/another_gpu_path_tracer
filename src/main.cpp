@@ -3,6 +3,7 @@
 #include "entities/Ray_t.h"
 #include "entities/Vec3.h"
 #include "shapes/Triangle_t.h"
+#include "entities/MeshGeometry_t.h"
 
 using AGPTracer::Entities::Vec3;
 using AGPTracer::Shapes::Triangle_t;
@@ -51,6 +52,8 @@ auto check_results(cl::sycl::buffer<Triangle_t, 1>& buffer) -> bool {
 auto main() -> int {
 	// Creating buffer of triangles to be used inside the kernel code
 	cl::sycl::buffer<Triangle_t, 1> triangle_buffer(cl::sycl::range<1>{12});
+
+    AGPTracer::Entities::MeshGeometry_t geom("../assets/Zombie_Beast4.obj");
 
     fill_triangles(triangle_buffer);
 
