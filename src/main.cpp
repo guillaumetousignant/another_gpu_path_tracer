@@ -53,7 +53,7 @@ auto main() -> int {
 	// Creating buffer of triangles to be used inside the kernel code
 	cl::sycl::buffer<Triangle_t, 1> triangle_buffer(cl::sycl::range<1>{12});
 
-    AGPTracer::Entities::MeshGeometry_t geom("../assets/Zombie_Beast4.obj");
+    AGPTracer::Entities::MeshGeometry_t geom("assets/Zombie_Beast4.obj");
 
     fill_triangles(triangle_buffer);
 
