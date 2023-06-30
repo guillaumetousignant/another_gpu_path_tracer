@@ -28,11 +28,11 @@ auto fill_triangles(cl::sycl::buffer<Triangle_t, 1>& buffer) -> void {
 
 auto check_results(cl::sycl::buffer<Triangle_t, 1>& buffer) -> bool {
     // Implicit barrier waiting for queue to complete the work.
-	const auto host_accessor = buffer.get_access<cl::sycl::access::mode::read>();
+    const auto host_accessor = buffer.get_access<cl::sycl::access::mode::read>();
 
-	// Check the results
-	bool MismatchFound = false;
-	for (size_t i = 0; i < buffer.get_range()[0]; ++i) {
+    // Check the results
+    bool MismatchFound = false;
+    for (size_t i = 0; i < buffer.get_range()[0]; ++i) {
         if (host_accessor[i].points_[0] != Vec3<double>{}) {
             std::cout << "The result is incorrect for triangle: " << i
                     << ", expected: (" << Vec3<double>{} << ", " << Vec3<double>{} << ", " << Vec3<double>{} 
@@ -40,42 +40,42 @@ auto check_results(cl::sycl::buffer<Triangle_t, 1>& buffer) -> bool {
                     << std::endl;
             MismatchFound = true;
         }
-	}
+    }
 
-	if (!MismatchFound) {
-		std::cout << "The results are correct!" << std::endl;
-	}
+    if (!MismatchFound) {
+        std::cout << "The results are correct!" << std::endl;
+    }
 
     return MismatchFound;
 }
 
 auto main() -> int {
-	// Creating buffer of triangles to be used inside the kernel code
-	cl::sycl::buffer<Triangle_t, 1> triangle_buffer(cl::sycl::range<1>{12});
+    // Creating buffer of triangles to be used inside the kernel code
+    cl::sycl::buffer<Triangle_t, 1> triangle_buffer(cl::sycl::range<1>{12});
 
     AGPTracer::Entities::MeshGeometry_t geom("assets/Zombie_Beast4.obj");
 
     fill_triangles(triangle_buffer);
 
-	// Creating SYCL queue
-	cl::sycl::queue queue;
+    // Creating SYCL queue
+    cl::sycl::queue queue;
 
-	// Size of index space for kernel
-	cl::sycl::range<1> num_work_items{triangle_buffer.get_range()};
+    // Size of index space for kernel
+    cl::sycl::range<1> num_work_items{triangle_buffer.get_range()};
 
-	// Submitting command group(work) to queue
-	queue.submit([&](cl::sycl::handler &cgh) {
-	// Getting read write access to the buffer on a device
-	auto triangle_accessor = triangle_buffer.get_access<cl::sycl::access::mode::read_write>(cgh);
-	// Executing kernel
-	cgh.parallel_for<class RotateTriangles>(
-		num_work_items, [=](cl::sycl::id<1> WIid) {
-	        triangle_accessor[WIid].transformation_.rotateZAxis(std::numbers::pi/4);
+    // Submitting command group(work) to queue
+    queue.submit([&](cl::sycl::handler &cgh) {
+    // Getting read write access to the buffer on a device
+    auto triangle_accessor = triangle_buffer.get_access<cl::sycl::access::mode::read_write>(cgh);
+    // Executing kernel
+    cgh.parallel_for<class RotateTriangles>(
+        num_work_items, [=](cl::sycl::id<1> WIid) {
+            triangle_accessor[WIid].transformation_.rotateZAxis(std::numbers::pi/4);
             triangle_accessor[WIid].update();
-		});
-	});
+        });
+    });
 
     const bool MismatchFound = check_results(triangle_buffer);
 
-	return MismatchFound;
+    return MismatchFound;
 }
