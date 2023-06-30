@@ -74,7 +74,7 @@ namespace AGPTracer { namespace Shapes {
              * This is used to find the surface normal on ray bounce. Used by materials to determine ray colour.
              * The texture coordinates is also returned, used by materials to fetch a colour in a texture.
              * The time parameter is for motionblur shapes, where time is used to interpolate. Not used here.
-             * The object coordinates are in barycentric cordinates (minus w) [u, v].
+             * The object coordinates are in barycentric coordinates (minus w) [u, v].
              * 
              * @param[in] time Time at which we want the normal and texture coordinates. Not used here.
              * @param[in] uv Object coordinates at which we want to find the normal and texture coordinates. The coordinates are in barycentric coordinates, minus w [u, v].
@@ -89,7 +89,7 @@ namespace AGPTracer { namespace Shapes {
              * 
              * This is used to find the surface normal on ray bounce. Used by materials to determine ray colour.
              * The time parameter is for motionblur shapes, where time is used to interpolate. Not used here.
-             * The object coordinates are in barycentric cordinates (minus w) [u, v].
+             * The object coordinates are in barycentric coordinates (minus w) [u, v].
              * 
              * @param[in] time Time at which we want the normal. Used when motion blur is used. Not used here.
              * @param[in] uv Object coordinates at which we want to find the normal. The coordinates are in barycentric coordinates, minus w [u, v].
@@ -105,7 +105,7 @@ namespace AGPTracer { namespace Shapes {
              * The texture coordinates is also returned, used by materials to fetch a colour in a texture. The tangent
              * vector is used by materials for normal mapping, as the normals returned by those textures are in object
              * coordinates. The time parameter is for motionblur shapes, where time is used to interpolate. Not used here.
-             * The object coordinates are in barycentric cordinates (minus w) [u, v].
+             * The object coordinates are in barycentric coordinates (minus w) [u, v].
              * 
              * @param[in] time Time at which we want the normal, tangent and texture coordinates. Used when motion blur is used. Not used here.
              * @param[in] uv Object coordinates at which we want to find the normal, texture coordinates and tangent vector. The coordinates are in barycentric coordinates, minus w [u, v].

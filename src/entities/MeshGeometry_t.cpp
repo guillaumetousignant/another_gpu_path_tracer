@@ -13,7 +13,6 @@ MeshGeometry_t::MeshGeometry_t(const std::filesystem::path &filename) {
     const std::filesystem::path ext = filename.extension();
     if(ext == ".obj") {
         readObj(filename);
-        build_missing_normals(missing_normals);
     } 
     else if(ext == ".su2") {
         readSU2(filename);
@@ -24,7 +23,7 @@ MeshGeometry_t::MeshGeometry_t(const std::filesystem::path &filename) {
     }
 }
 
-auto MeshGeometry_t::readObj(const std::filesystem::path &filename) {
+auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
     size_t nv = 0;
     size_t nvt = 0;
     size_t nvn = 0;
@@ -37,7 +36,7 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) {
     std::ifstream meshfile(filename);
     if (!meshfile.is_open()) {
         std::cerr << "Error: file '" << filename << "' could not be opened. Exiting." << std::endl;
-        return std::vector<bool>();
+        exit(101);
     }
 
     // Getting number of elements
@@ -131,8 +130,8 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) {
                         face_nodes_[f_counter][i] = std::stoi(value, nullptr) - 1;
                         face_texture_coordinates_[f_counter][i] = static_cast<size_t>(-1);
                         face_normals_[f_counter][i] = static_cast<size_t>(-1);
-                        missing_normals[f_counter*3 + i] = true;
-                        missing_texture_coordinates[f_counter*3 + i] = true;
+                        missing_normals[f_counter][i] = true;
+                        missing_texture_coordinates[f_counter][i] = true;
                     }
                     else {
                         face_nodes_[f_counter][i] = std::stoi(value.substr(0, pos), nullptr) - 1;
@@ -142,21 +141,21 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) {
                         if (pos == std::string::npos) {
                             face_texture_coordinates_[f_counter][i] = std::stoi(value, nullptr) - 1;
                             face_normals_[f_counter][i] = static_cast<size_t>(-1);
-                            missing_normals[f_counter*3 + i] = true;
-                            missing_texture_coordinates[f_counter*3 + i] = false;
+                            missing_normals[f_counter][i] = true;
+                            missing_texture_coordinates[f_counter][i] = false;
                         }
                         else {
                             if (pos == 0) {
                                 face_texture_coordinates_[f_counter][i] = static_cast<size_t>(-1);
-                                missing_texture_coordinates[f_counter*3 + i] = true;
+                                missing_texture_coordinates[f_counter][i] = true;
                             }
                             else {
                                 face_texture_coordinates_[f_counter][i] = std::stoi(value.substr(0, pos), nullptr) - 1;
-                                missing_texture_coordinates[f_counter*3 + i] = false;
+                                missing_texture_coordinates[f_counter][i] = false;
                             }
                             value.erase(0, pos + 1);
                             face_normals_[f_counter][i] = std::stoi(value, nullptr) - 1;
-                            missing_normals[f_counter*3 + i] = false;
+                            missing_normals[f_counter][i] = false;
                         }
                     }
                 }
@@ -192,7 +191,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
     std::ifstream meshfile(filename);
     if (!meshfile.is_open()) {
         std::cerr << "Error: file '" << filename << "' could not be opened. Exiting." << std::endl;
-        return std::vector<bool>();
+        exit(102);
     }
 
     // Getting number of elements
@@ -277,7 +276,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
     const size_t n_tris = nf;
     mat_ = std::vector<std::string>(n_tris);
     normals_ = std::vector<Vec3<double>>(3 * n_tris);
-    texture_coordinates_ = std::vector<std::array<double, 2>>(3 * n_tris)
+    texture_coordinates_ = std::vector<std::array<double, 2>>(3 * n_tris);
     face_nodes_ = std::vector<std::array<size_t, 3>>(n_tris);
     face_texture_coordinates_ = std::vector<std::array<size_t, 3>>(n_tris);
     face_normals_ = std::vector<std::array<size_t, 3>>(n_tris);
@@ -356,10 +355,9 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
 auto MeshGeometry_t::build_missing_normals(const std::vector<std::array<bool, 3>>& normals_to_build) -> void {
     size_t normals_to_add = 0;
     for (size_t i = 0; i < normals_to_build.size(); ++i) {
-        bool normal_to_add = false;
         for (size_t j = 0; j < normals_to_build[i].size(); ++j) {
             if (normals_to_build[i][j]) {
-                ++normal_to_add;
+                ++normals_to_add;
                 break;
             }
         }
@@ -367,14 +365,14 @@ auto MeshGeometry_t::build_missing_normals(const std::vector<std::array<bool, 3>
 
     if (normals_to_add > 0) {
         const size_t offset = normals_.size();
-        normals_.resize(offset + normal_to_add);
+        normals_.resize(offset + normals_to_add);
 
         size_t index = 0;
         for (size_t i = 0; i < normals_to_build.size(); ++i) {
             bool normal_to_add = false;
             for (size_t j = 0; j < normals_to_build[i].size(); ++j) {
                 if (normals_to_build[i][j]) {
-                    ++normal_to_add;
+                    normal_to_add = true;
                     break;
                 }
             }
@@ -403,7 +401,7 @@ auto MeshGeometry_t::build_missing_texture_coordinates(const std::vector<std::ar
     }
 
     if (texture_coordinates_to_add) {
-        texture_coordinates_.emplace_back(0.0, 0.0);
+        texture_coordinates_.emplace_back(std::array<double, 2>{0.0, 0.0});
         for (size_t i = 0; i < texture_coordinates_to_build.size(); ++i) {
             for (size_t j = 0; j < texture_coordinates_to_build[i].size(); ++j) {
                 if (texture_coordinates_to_build[i][j]) {

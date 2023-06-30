@@ -13,7 +13,7 @@ namespace AGPTracer { namespace Entities {
      * @brief The mesh geometry class represents a geometry made up of points and triangular faces.
      * 
      * Mesh geometries represent a single geometry without any transformation. Multiple meshes can point to the same mesh geometry
-     * while using different transformations, enabling instanciating and saving ressources. This class is constructed from geometry
+     * while using different transformations, enabling instantiating and saving ressources. This class is constructed from geometry
      * input files. Currently, .obj and .su2 files are supported.
      */
     class MeshGeometry_t {
@@ -42,7 +42,7 @@ namespace AGPTracer { namespace Entities {
              * 
              * @param filename Path to a geometry file in .obj format.
              */
-            auto readObj(const std::filesystem::path &filename);
+            auto readObj(const std::filesystem::path &filename) -> void;
 
             /**
              * @brief Fills the class' members form a .su2 file.
