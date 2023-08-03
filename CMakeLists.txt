@@ -10,7 +10,7 @@ option(USE_hipSYCL "Use the hipSYCL backend." OFF)
 option(USE_clangSYCL "Use the Intel clang SYCL backend." ON)
 option(USE_IPO "Use interprocedural optimization." OFF)
 
-project(SYCL_TEST VERSION 1.0.0 LANGUAGES CXX C)
+project(SYCL_TEST VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
