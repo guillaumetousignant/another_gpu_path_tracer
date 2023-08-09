@@ -18,9 +18,6 @@ if(USE_hipSYCL)
 endif()
 
 if(USE_clangSYCL)
-    target_link_directories(AGPTracer PUBLIC $ENV{SYCL_LINK_DIR})
-    target_link_libraries(AGPTracer PUBLIC sycl7)
-
     if (BUILD_CUDA)
         target_compile_options(AGPTracer PUBLIC -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
         target_link_options(AGPTracer PUBLIC -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
