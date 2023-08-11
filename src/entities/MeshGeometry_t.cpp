@@ -1,20 +1,20 @@
 #include "entities/MeshGeometry_t.h"
-#include <string>
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <cmath>
-#include <algorithm>
+#include <string>
 
 using AGPTracer::Entities::MeshGeometry_t;
 using AGPTracer::Entities::Vec3;
 
-MeshGeometry_t::MeshGeometry_t(const std::filesystem::path &filename) {
+MeshGeometry_t::MeshGeometry_t(const std::filesystem::path& filename) {
     const std::filesystem::path ext = filename.extension();
-    if(ext == ".obj") {
+    if (ext == ".obj") {
         readObj(filename);
-    } 
-    else if(ext == ".su2") {
+    }
+    else if (ext == ".su2") {
         readSU2(filename);
     }
     else {
@@ -23,11 +23,11 @@ MeshGeometry_t::MeshGeometry_t(const std::filesystem::path &filename) {
     }
 }
 
-auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
-    size_t nv = 0;
+auto MeshGeometry_t::readObj(const std::filesystem::path& filename) -> void {
+    size_t nv  = 0;
     size_t nvt = 0;
     size_t nvn = 0;
-    size_t nf = 0;
+    size_t nf  = 0;
     unsigned int nsides;
     std::string line;
     std::string token;
@@ -63,16 +63,16 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
     }
 
     // Getting normals, vertex coordinates and texture coordinates
-    size_t v_counter = 0;
+    size_t v_counter  = 0;
     size_t vt_counter = 0;
     size_t vn_counter = 0;
     double val0;
     double val1;
     double val2;
 
-    nodes_ = std::vector<Vec3<double>>(nv);
+    nodes_               = std::vector<Vec3<double>>(nv);
     texture_coordinates_ = std::vector<std::array<double, 2>>(nvt);
-    normals_ = std::vector<Vec3<double>>(nvn);
+    normals_             = std::vector<Vec3<double>>(nvn);
 
     meshfile.clear();
     meshfile.seekg(0, std::ios::beg);
@@ -96,7 +96,7 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
             normals_[vn_counter] = Vec3<double>(val0, val1, val2);
             ++vn_counter;
         }
-    }   
+    }
 
     // Filling faces
     size_t f_counter = 0;
@@ -105,11 +105,11 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
     std::string value;
     size_t pos;
 
-    const size_t n_tris = nf;
-    mat_ = std::vector<std::string>(n_tris);
-    face_nodes_ = std::vector<std::array<size_t, 3>>(n_tris);
+    const size_t n_tris       = nf;
+    mat_                      = std::vector<std::string>(n_tris);
+    face_nodes_               = std::vector<std::array<size_t, 3>>(n_tris);
     face_texture_coordinates_ = std::vector<std::array<size_t, 3>>(n_tris);
-    face_normals_ = std::vector<std::array<size_t, 3>>(n_tris);
+    face_normals_             = std::vector<std::array<size_t, 3>>(n_tris);
     std::vector<std::array<bool, 3>> missing_normals(n_tris);
     std::vector<std::array<bool, 3>> missing_texture_coordinates(n_tris);
 
@@ -123,14 +123,14 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
             liness >> tokens[0] >> tokens[1];
             while (liness >> tokens[2]) {
                 for (unsigned int i = 0; i < 3; ++i) {
-                    value = tokens[i];
+                    value           = tokens[i];
                     mat_[f_counter] = material;
-                    pos = value.find('/');
+                    pos             = value.find('/');
                     if (pos == std::string::npos) {
-                        face_nodes_[f_counter][i] = std::stoi(value, nullptr) - 1;
-                        face_texture_coordinates_[f_counter][i] = static_cast<size_t>(-1);
-                        face_normals_[f_counter][i] = static_cast<size_t>(-1);
-                        missing_normals[f_counter][i] = true;
+                        face_nodes_[f_counter][i]                 = std::stoi(value, nullptr) - 1;
+                        face_texture_coordinates_[f_counter][i]   = static_cast<size_t>(-1);
+                        face_normals_[f_counter][i]               = static_cast<size_t>(-1);
+                        missing_normals[f_counter][i]             = true;
                         missing_texture_coordinates[f_counter][i] = true;
                     }
                     else {
@@ -139,22 +139,22 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
 
                         pos = value.find('/');
                         if (pos == std::string::npos) {
-                            face_texture_coordinates_[f_counter][i] = std::stoi(value, nullptr) - 1;
-                            face_normals_[f_counter][i] = static_cast<size_t>(-1);
-                            missing_normals[f_counter][i] = true;
+                            face_texture_coordinates_[f_counter][i]   = std::stoi(value, nullptr) - 1;
+                            face_normals_[f_counter][i]               = static_cast<size_t>(-1);
+                            missing_normals[f_counter][i]             = true;
                             missing_texture_coordinates[f_counter][i] = false;
                         }
                         else {
                             if (pos == 0) {
-                                face_texture_coordinates_[f_counter][i] = static_cast<size_t>(-1);
+                                face_texture_coordinates_[f_counter][i]   = static_cast<size_t>(-1);
                                 missing_texture_coordinates[f_counter][i] = true;
                             }
                             else {
-                                face_texture_coordinates_[f_counter][i] = std::stoi(value.substr(0, pos), nullptr) - 1;
+                                face_texture_coordinates_[f_counter][i]   = std::stoi(value.substr(0, pos), nullptr) - 1;
                                 missing_texture_coordinates[f_counter][i] = false;
                             }
                             value.erase(0, pos + 1);
-                            face_normals_[f_counter][i] = std::stoi(value, nullptr) - 1;
+                            face_normals_[f_counter][i]   = std::stoi(value, nullptr) - 1;
                             missing_normals[f_counter][i] = false;
                         }
                     }
@@ -162,7 +162,6 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
                 ++f_counter;
                 tokens[1] = tokens[2];
             }
-            
         }
         else if (token == "usemtl") { // check if there is :
             liness >> tokens[0];
@@ -172,7 +171,7 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
             }
             material = tokens[0];
         }
-    }    
+    }
 
     meshfile.close();
 
@@ -180,7 +179,7 @@ auto MeshGeometry_t::readObj(const std::filesystem::path &filename) -> void {
     build_missing_texture_coordinates(missing_texture_coordinates);
 }
 
-auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
+auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
     size_t nv = 0;
     size_t nf = 0;
     std::string line;
@@ -228,7 +227,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
             }
         }
     }
-    
+
     // Getting normals, vertex coordinates and texture coordinates
     size_t v_counter = 0;
     double val0;
@@ -264,7 +263,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
             nodes_[v_counter] = Vec3<double>(val0, val1, val2);
             ++v_counter;
         }
-    } 
+    }
 
     // Filling faces
     size_t f_counter = 0;
@@ -273,13 +272,13 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
     wall_started = false;
     std::string marker_token;
 
-    const size_t n_tris = nf;
-    mat_ = std::vector<std::string>(n_tris);
-    normals_ = std::vector<Vec3<double>>(3 * n_tris);
-    texture_coordinates_ = std::vector<std::array<double, 2>>(3 * n_tris);
-    face_nodes_ = std::vector<std::array<size_t, 3>>(n_tris);
+    const size_t n_tris       = nf;
+    mat_                      = std::vector<std::string>(n_tris);
+    normals_                  = std::vector<Vec3<double>>(3 * n_tris);
+    texture_coordinates_      = std::vector<std::array<double, 2>>(3 * n_tris);
+    face_nodes_               = std::vector<std::array<size_t, 3>>(n_tris);
     face_texture_coordinates_ = std::vector<std::array<size_t, 3>>(n_tris);
-    face_normals_ = std::vector<std::array<size_t, 3>>(n_tris);
+    face_normals_             = std::vector<std::array<size_t, 3>>(n_tris);
 
     meshfile.clear();
     meshfile.seekg(0, std::ios::beg);
@@ -298,7 +297,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
             if (marker_token != "WALL") {
                 wall_started = false;
             }
-        } 
+        }
         else if (token.empty() || token == "NMARK=" || token == "NELEM=" || token == "MARKER_ELEMS=") {
             wall_started = false;
         }
@@ -307,47 +306,47 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path &filename) -> void {
             if (token == "5") {
                 for (unsigned int i = 0; i < 3; ++i) {
                     liness >> tokens[i];
-                    face_nodes_[f_counter][i] = tokens[i];
-                    mat_[f_counter] = material;
-                    normals_[3 * f_counter + i] = Vec3<double>(0.0); // CHECK fill
+                    face_nodes_[f_counter][i]               = tokens[i];
+                    mat_[f_counter]                         = material;
+                    normals_[3 * f_counter + i]             = Vec3<double>(0.0); // CHECK fill
                     texture_coordinates_[3 * f_counter + i] = std::array<double, 2>{0.0, 0.0};
                     face_texture_coordinates_[f_counter][i] = 3 * f_counter + i;
-                    face_normals_[f_counter][i] = 3 * f_counter + i;
+                    face_normals_[f_counter][i]             = 3 * f_counter + i;
                 }
                 ++f_counter;
             }
             else if (token == "9") {
                 for (unsigned int i = 0; i < 3; ++i) {
                     liness >> tokens[i];
-                    face_nodes_[f_counter][i] = tokens[i];
-                    mat_[f_counter] = material;
-                    normals_[3 * f_counter + i] = Vec3<double>(0.0); // CHECK fill
+                    face_nodes_[f_counter][i]               = tokens[i];
+                    mat_[f_counter]                         = material;
+                    normals_[3 * f_counter + i]             = Vec3<double>(0.0); // CHECK fill
                     texture_coordinates_[3 * f_counter + i] = std::array<double, 2>{0.0, 0.0};
                     face_texture_coordinates_[f_counter][i] = 3 * f_counter + i;
-                    face_normals_[f_counter][i] = 3 * f_counter + i;
+                    face_normals_[f_counter][i]             = 3 * f_counter + i;
                 }
                 ++f_counter;
                 tokens[1] = tokens[2];
                 liness >> tokens[2];
                 for (unsigned int i = 0; i < 3; ++i) {
-                    face_nodes_[f_counter][i] = tokens[i];
-                    mat_[f_counter] = material;
-                    normals_[3 * f_counter + i] = Vec3<double>(0.0); // CHECK fill
+                    face_nodes_[f_counter][i]               = tokens[i];
+                    mat_[f_counter]                         = material;
+                    normals_[3 * f_counter + i]             = Vec3<double>(0.0); // CHECK fill
                     texture_coordinates_[3 * f_counter + i] = std::array<double, 2>{0.0, 0.0};
                     face_texture_coordinates_[f_counter][i] = 3 * f_counter + i;
-                    face_normals_[f_counter][i] = 3 * f_counter + i;
+                    face_normals_[f_counter][i]             = 3 * f_counter + i;
                 }
                 ++f_counter;
             }
-        }   
+        }
 
         if (token == "MARKER_TAG=") {
             if (marker_token == "WALL") {
                 wall_started = true;
                 std::getline(meshfile, line);
             }
-        }     
-    } 
+        }
+    }
 
     meshfile.close();
 }

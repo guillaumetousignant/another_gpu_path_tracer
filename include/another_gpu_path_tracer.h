@@ -3,11 +3,12 @@
 
 /**
  * @brief Contains all the objects and functions of the library.
- * 
+ *
  * All the different namespaces are pulled under this one, in addition to the SceneContext
- * object. 
+ * object.
  */
-namespace AGPTracer {}
+namespace AGPTracer {
+}
 
 #include "entities/entities.h"
 

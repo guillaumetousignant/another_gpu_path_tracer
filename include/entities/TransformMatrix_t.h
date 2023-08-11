@@ -6,10 +6,10 @@
 #include <CL/sycl.hpp>
 
 namespace AGPTracer { namespace Entities {
-    
+
     /**
      * @brief The transformation matrix class represents a 4x4 3D transformation matrix, used to transform other objects in 3D space.
-     * 
+     *
      * The transformation matrix can be rotated, scaled, translated and other operations. Other objects, such as shapes and rays,
      * then use the transformation matrix to modify themselves. All objects using transformation matrices can therefore be modified
      * in a single unified way, without modifying the underlying objects. This enables basic instancing.
@@ -23,9 +23,9 @@ namespace AGPTracer { namespace Entities {
 
             /**
              * @brief Construct a new TransformMatrix_t object from the 16 values of its 4x4 matrix.
-             * 
+             *
              * Elements are given row by row. The identity matrix has ones on its diagonal.
-             * 
+             *
              * @param i0 Element at position (1, 1)
              * @param i1 Element at position (1, 2)
              * @param i2 Element at position (1, 3)
@@ -43,21 +43,22 @@ namespace AGPTracer { namespace Entities {
              * @param i14 Element at position (4, 3)
              * @param i15 Element at position (4, 4)
              */
-            TransformMatrix_t(double i0, double i1, double i2, double i3, double i4, double i5, double i6, double i7, double i8, double i9, double i10, double i11, double i12, double i13, double i14, double i15);
+            TransformMatrix_t(
+                double i0, double i1, double i2, double i3, double i4, double i5, double i6, double i7, double i8, double i9, double i10, double i11, double i12, double i13, double i14, double i15);
 
             /**
              * @brief Construct a new TransformMatrix_t object from an array of the 16 values of its 4x4 matrix.
-             * 
+             *
              * @param values Array containing the elements of the matrix, ordered by rows.
              */
             TransformMatrix_t(std::array<double, 16> values);
 
             /**
              * @brief Construct a new TransformMatrix_t object from another transformation matrix, copying it.
-             * 
+             *
              * @param other Transformation matrix to be copied into the new transformation matrix.
              */
-            TransformMatrix_t(const TransformMatrix_t &other) = default;
+            TransformMatrix_t(const TransformMatrix_t& other) = default;
 
             std::array<double, 16> matrix_; /**< @brief Array of the 16 values in the 4x4 matrix.*/
             std::array<double, 16> matrix_inverse_; /**< @brief Transposed inverted matrix, used to transform directions.*/
@@ -65,9 +66,9 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix around the x axis by a specified angle in radians.
-             * 
+             *
              * This means that if an object it at (0, 1, 0) and is rotated π rad, it will be at (0, -1, 0) and face the opposite direction.
-             * 
+             *
              * @param angle Angle in radians to rotate around the x axis.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
@@ -76,9 +77,9 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix around the x axis by a specified angle in radians.
-             * 
+             *
              * This means that if an object it at (1, 0, 0) and is rotated π rad, it will be at (-1, 0, 0) and face the opposite direction.
-             * 
+             *
              * @param angle Angle in radians to rotate around the y axis.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
@@ -87,9 +88,9 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix around the z axis by a specified angle in radians.
-             * 
+             *
              * This means that if an object it at (1, 0, 0) and is rotated π rad, it will be at (-1, 0, 0) and face the opposite direction.
-             * 
+             *
              * @param angle Angle in radians to rotate around the z axis.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
@@ -98,9 +99,9 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix on itself around the x direction.
-             * 
+             *
              * The object won't move but will face the opposite direction around x.
-             * 
+             *
              * @param angle Angle in radians to rotate on itself around the x direction.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
@@ -109,9 +110,9 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix on itself around the y direction.
-             * 
+             *
              * The object won't move but will face the opposite direction around y.
-             * 
+             *
              * @param angle Angle in radians to rotate on itself around the y direction.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
@@ -120,9 +121,9 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix on itself around the z direction.
-             * 
+             *
              * The object won't move but will face the opposite direction around z.
-             * 
+             *
              * @param angle Angle in radians to rotate on itself around the z direction.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
@@ -131,57 +132,57 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix around an arbitrary axis by a specified angle in radians.
-             * 
+             *
              * This rotates the matrix around an arbitrary axis passing through (0, 0, 0).
              * This moves the object.
-             * 
+             *
              * @param vec Axis around which the matrix will be rotated. Passes through (0, 0, 0).
              * @param angle Angle in radians to rotate around the axis.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
-            auto rotateAxis(const Vec3<double> &vec, double angle) -> TransformMatrix_t&;
+            auto rotateAxis(const Vec3<double>& vec, double angle) -> TransformMatrix_t&;
 
             SYCL_EXTERNAL
             /**
              * @brief Rotates the matrix on itself around an arbitrary axis by a specified angle in radians.
-             * 
+             *
              * This rotates the matrix around an arbitrary axis passing through the matrix's center.
              * This doesn't move the object.
-             * 
+             *
              * @param vec Axis around which the matrix will be rotated on itself.
              * @param angle Angle in radians to rotate on itself around the axis' direction.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
-            auto rotate(const Vec3<double> &vec, double angle) -> TransformMatrix_t&;
+            auto rotate(const Vec3<double>& vec, double angle) -> TransformMatrix_t&;
 
             SYCL_EXTERNAL
             /**
              * @brief Translates the matrix in 3D space.
-             * 
+             *
              * @param vec Vector by which to translate the matrix.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
-            auto translate(const Vec3<double> &vec) -> TransformMatrix_t&;
+            auto translate(const Vec3<double>& vec) -> TransformMatrix_t&;
 
             SYCL_EXTERNAL
             /**
              * @brief Scales the matrix from (0, 0, 0) by a three-component vector.
-             * 
+             *
              * This means that if an object is at (1, 0, 1) and is scaled by (2, 2, 1) it will
              * be placed at (2, 0, 1) and be twice bigger except for the z direction.
-             * 
+             *
              * @param vec Vector whose three components are the scale factors for the three axis.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
-            auto scaleAxis(const Vec3<double> &vec) -> TransformMatrix_t&;
+            auto scaleAxis(const Vec3<double>& vec) -> TransformMatrix_t&;
 
             SYCL_EXTERNAL
             /**
              * @brief Scales the matrix from (0, 0, 0) by a factor.
-             * 
+             *
              * This means that if an object is at (1, 0, 1) and is scaled by 2 it will
              * be placed at (2, 0, 2) and be twice bigger.
-             * 
+             *
              * @param fac Factor by which the matrix will be scaled from (0, 0, 0).
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
@@ -190,20 +191,20 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Scales the matrix inplace by a three-component vector.
-             * 
+             *
              * This won't move the object.
-             * 
+             *
              * @param vec Vector whose three components are the scale factors for the three axis.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
-            auto scale(const Vec3<double> &vec) -> TransformMatrix_t&;
+            auto scale(const Vec3<double>& vec) -> TransformMatrix_t&;
 
             SYCL_EXTERNAL
             /**
              * @brief Scales the matrix inplace by a factor.
-             * 
+             *
              * This won't move the object.
-             * 
+             *
              * @param fac Scale factors for the three axis.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
@@ -212,29 +213,29 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Reflects the matrix. Not implemented yet.
-             * 
+             *
              * Not implemented.
-             * 
+             *
              * @param vec Vector around which to reflect.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
-            auto reflect(const Vec3<double> &vec) -> TransformMatrix_t&;
+            auto reflect(const Vec3<double>& vec) -> TransformMatrix_t&;
 
             SYCL_EXTERNAL
             /**
              * @brief Shears the matrix. Not implemented yet.
-             * 
+             *
              * Not implemented.
-             * 
+             *
              * @param vec Vector along which to shear.
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
-            auto shear(const Vec3<double> &vec) -> TransformMatrix_t&;
+            auto shear(const Vec3<double>& vec) -> TransformMatrix_t&;
 
             SYCL_EXTERNAL
             /**
              * @brief Transposes the matrix.
-             * 
+             *
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
             auto transpose() -> TransformMatrix_t&;
@@ -242,9 +243,9 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Inverts the matrix.
-             * 
+             *
              * See https://graphics.stanford.edu/~mdfisher/Code/Engine/Matrix4.cpp.html
-             * 
+             *
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
             auto invert() -> TransformMatrix_t&;
@@ -252,7 +253,7 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Negates the matrix.
-             * 
+             *
              * @return TransformMatrix_t& Reference to this matrix, used to chain operations.
              */
             auto neg() -> TransformMatrix_t&;
@@ -260,25 +261,25 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Transforms a point with the matrix, moving it around according to the operations made on the matrix.
-             * 
+             *
              * @param vec Point to transform.
              * @return Vec3 Transformed point.
              */
-            auto multVec(const Vec3<double> &vec) const -> Vec3<double>;
+            auto multVec(const Vec3<double>& vec) const -> Vec3<double>;
 
             SYCL_EXTERNAL
             /**
              * @brief Transforms a direction, rotating it according to the operations made on the matrix.
-             * 
+             *
              * @param vec Direction to transform.
              * @return Vec3<double> Transformed direction.
              */
-            auto multDir(const Vec3<double> &vec) const -> Vec3<double>;
+            auto multDir(const Vec3<double>& vec) const -> Vec3<double>;
 
             SYCL_EXTERNAL
             /**
              * @brief Get the maximum scale of all three axis.
-             * 
+             *
              * @return double Maximum scale of the matrix.
              */
             auto getScale() const -> double;
@@ -287,7 +288,7 @@ namespace AGPTracer { namespace Entities {
             SYCL_EXTERNAL
             /**
              * @brief Builds the transposed inverse matrix, to transform directions.
-             * 
+             *
              * This should be called after each transformation to ensure the inverse is up to date.
              */
             auto buildInverse() -> void;
