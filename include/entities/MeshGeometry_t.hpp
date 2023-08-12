@@ -1,7 +1,7 @@
-#ifndef AGPTRACER_ENTITIES_MESHGEOMETRYUNSTRUCTURED_T_H
-#define AGPTRACER_ENTITIES_MESHGEOMETRYUNSTRUCTURED_T_H
+#ifndef AGPTRACER_ENTITIES_MESHGEOMETRYUNSTRUCTURED_T_HPP
+#define AGPTRACER_ENTITIES_MESHGEOMETRYUNSTRUCTURED_T_HPP
 
-#include "entities/Vec3.h"
+#include "entities/Vec3.hpp"
 #include <array>
 #include <filesystem>
 #include <string>

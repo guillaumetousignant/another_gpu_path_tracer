@@ -1,4 +1,4 @@
-#include "shapes/Triangle_t.h"
+#include "shapes/Triangle_t.hpp"
 // #include "entities/Material_t.h"
 #include <algorithm>
 #include <cmath>

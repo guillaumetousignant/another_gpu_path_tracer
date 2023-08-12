@@ -1,4 +1,4 @@
-#include "entities/Ray_t.h"
+#include "entities/Ray_t.hpp"
 // #include "entities/Material_t.h"
 // #include "entities/Medium_t.h"
 // #include "entities/Scene_t.h"

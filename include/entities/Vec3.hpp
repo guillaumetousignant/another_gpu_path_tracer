@@ -1,5 +1,5 @@
-#ifndef AGPTRACER_ENTITIES_Vec3_H
-#define AGPTRACER_ENTITIES_Vec3_H
+#ifndef AGPTRACER_ENTITIES_Vec3_HPP
+#define AGPTRACER_ENTITIES_Vec3_HPP
 
 #include <algorithm>
 #include <array>

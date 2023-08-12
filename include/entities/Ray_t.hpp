@@ -1,7 +1,7 @@
-#ifndef AGPTRACER_ENTITIES_RAY_T_H
-#define AGPTRACER_ENTITIES_RAY_T_H
+#ifndef AGPTRACER_ENTITIES_RAY_T_HPP
+#define AGPTRACER_ENTITIES_RAY_T_HPP
 
-#include "entities/Vec3.h"
+#include "entities/Vec3.hpp"
 #include <list>
 
 namespace AGPTracer { namespace Entities {

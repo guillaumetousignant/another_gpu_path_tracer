@@ -1,5 +1,5 @@
-#ifndef AGPTRACER_ANOTHER_PATH_TRACER_H
-#define AGPTRACER_ANOTHER_PATH_TRACER_H
+#ifndef AGPTRACER_ANOTHER_PATH_TRACER_HPP
+#define AGPTRACER_ANOTHER_PATH_TRACER_HPP
 
 /**
  * @brief Contains all the objects and functions of the library.
@@ -10,6 +10,7 @@
 namespace AGPTracer {
 }
 
-#include "entities/entities.h"
+#include "entities/entities.hpp"
+#include "entities/shapes.hpp"
 
 #endif

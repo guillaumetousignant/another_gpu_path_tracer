@@ -1,5 +1,5 @@
-#ifndef AGPTRACER_ENTITIES_ENTITIES_H
-#define AGPTRACER_ENTITIES_ENTITIES_H
+#ifndef AGPTRACER_ENTITIES_ENTITIES_HPP
+#define AGPTRACER_ENTITIES_ENTITIES_HPP
 namespace AGPTracer {
     /**
      * @brief Contains the fundamental types of the project.
@@ -11,9 +11,9 @@ namespace AGPTracer {
     }
 }
 
-#include "MeshGeometry_t.h"
-#include "Ray_t.h"
-#include "TransformMatrix_t.h"
-#include "Vec3.h"
+#include "MeshGeometry_t.hpp"
+#include "Ray_t.hpp"
+#include "TransformMatrix_t.hpp"
+#include "Vec3.hpp"
 
 #endif

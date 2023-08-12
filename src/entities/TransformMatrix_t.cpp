@@ -1,4 +1,4 @@
-#include "entities/TransformMatrix_t.h"
+#include "entities/TransformMatrix_t.hpp"
 #include <algorithm>
 #include <CL/sycl.hpp>
 #include <cmath>

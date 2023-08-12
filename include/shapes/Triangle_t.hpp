@@ -1,9 +1,9 @@
-#ifndef AGPTRACER_SHAPES_TRIANGLE_T_H
-#define AGPTRACER_SHAPES_TRIANGLE_T_H
+#ifndef AGPTRACER_SHAPES_TRIANGLE_T_HPP
+#define AGPTRACER_SHAPES_TRIANGLE_T_HPP
 
-#include "entities/Ray_t.h"
-#include "entities/TransformMatrix_t.h"
-#include "entities/Vec3.h"
+#include "entities/Ray_t.hpp"
+#include "entities/TransformMatrix_t.hpp"
+#include "entities/Vec3.hpp"
 #include <array>
 #include <CL/sycl.hpp>
 #include <optional>

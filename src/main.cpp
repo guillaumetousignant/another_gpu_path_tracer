@@ -1,7 +1,7 @@
-#include "entities/MeshGeometry_t.h"
-#include "entities/Ray_t.h"
-#include "entities/Vec3.h"
-#include "shapes/Triangle_t.h"
+#include "entities/MeshGeometry_t.hpp"
+#include "entities/Ray_t.hpp"
+#include "entities/Vec3.hpp"
+#include "shapes/Triangle_t.hpp"
 #include <CL/sycl.hpp>
 #include <numbers>
 

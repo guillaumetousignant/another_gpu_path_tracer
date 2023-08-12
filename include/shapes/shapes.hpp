@@ -1,5 +1,5 @@
-#ifndef AGPTRACER_SHAPES_SHAPES_H
-#define AGPTRACER_SHAPES_SHAPES_H
+#ifndef AGPTRACER_SHAPES_SHAPES_HPP
+#define AGPTRACER_SHAPES_SHAPES_HPP
 
 namespace AGPTracer {
     /**
@@ -15,6 +15,6 @@ namespace AGPTracer {
     }
 }
 
-#include "Triangle_t.h"
+#include "Triangle_t.hpp"
 
 #endif
