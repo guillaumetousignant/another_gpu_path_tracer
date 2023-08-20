@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <CL/sycl.hpp>
 #include <cmath>
 #include <iostream>
 #include <utility>
@@ -14,8 +15,10 @@ namespace AGPTracer { namespace Entities {
      *
      * This can be used for 3D coordinates, 3D directions, 3-component colours, etc.
      * Several arithmetical operations are defined for those vectors.
+     *
+     * @tparam T Floating point datatype to use
      */
-    template<typename T>
+    template<typename T = double>
     class Vec3 {
         public:
             std::array<T, 3> v_; /**< @brief Array of the 3 values in the vector.*/
@@ -51,6 +54,7 @@ namespace AGPTracer { namespace Entities {
             /**
              * @brief Accesses the selected component of the vector, returning a reference.
              *
+             * @tparam T2 Indexing type
              * @param index Index of the component to access.
              * @return T& Reference to the selected component.
              */
@@ -60,6 +64,7 @@ namespace AGPTracer { namespace Entities {
             /**
              * @brief Returns the selected component of the vector.
              *
+             * @tparam T2 Indexing type
              * @param index Index of the component to return.
              * @return T Selected component.
              */
@@ -71,6 +76,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (x1*a, y1*a, z1*a).
              *
+             * @tparam T2 Other type
              * @param scale Factor used to multiply all components of the vector.
              * @return Vec3 Resulting vector, (x1*a, y1*a, z1*a).
              */
@@ -82,6 +88,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (x1*x2, y1*y2, z1*z3).
              *
+             * @tparam T2 Other type
              * @param other Vector used to multiply.
              * @return Vec3 Resulting vector, (x1*x2, y1*y2, z1*z3).
              */
@@ -93,6 +100,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (x1/a, y1/a, z1/a).
              *
+             * @tparam T2 Other type
              * @param scale Factor used to divide all components of the vector.
              * @return Vec3 Resulting vector, (x1/a, y1/a, z1/a).
              */
@@ -104,6 +112,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (x1/x2, y1/y2, z1/z2).
              *
+             * @tparam T2 Other type
              * @param other Vector used to divide the components of this vector.
              * @return Vec3 Resulting vector, (x1/x2, y1/y2, z1/z2).
              */
@@ -115,6 +124,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (x1+x2, y1+y2, z1+z2).
              *
+             * @tparam T2 Other type
              * @param other Vector added to this vector.
              * @return Vec3 Resulting vector, (x1+x2, y1+y2, z1+z2).
              */
@@ -126,6 +136,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (x1+a, y1+a, z1+a).
              *
+             * @tparam T2 Other type
              * @param factor Factor added to all components of the vector.
              * @return Vec3 Resulting vector, (x1+a, y1+a, z1+a).
              */
@@ -133,22 +144,24 @@ namespace AGPTracer { namespace Entities {
             constexpr auto operator+(T2 factor) const -> Vec3<decltype(std::declval<T>() + std::declval<T2>())>;
 
             /**
-             * @brief Substracts a vector from this vector.
+             * @brief Subtracts a vector from this vector.
              *
              * Returns (x1-x2, y1-y2, z1-z2).
              *
-             * @param other Vector to substract from this vector.
+             * @tparam T2 Other type
+             * @param other Vector to subtract from this vector.
              * @return Vec3 Resulting vector, (x1-x2, y1-y2, z1-z2).
              */
             template<class T2>
             constexpr auto operator-(const Vec3<T2>& other) const -> Vec3<decltype(std::declval<T>() - std::declval<T2>())>;
 
             /**
-             * @brief Substracts a factor from all components of the vector.
+             * @brief Subtracts a factor from all components of the vector.
              *
              * Returns (x1-a, y1-a, z1-a).
              *
-             * @param factor Factor substracted from all components of the vector.
+             * @tparam T2 Other type
+             * @param factor Factor subtracted from all components of the vector.
              * @return Vec3 Resulting vector, (x1-a, y1-a, z1-a).
              */
             template<class T2>
@@ -177,6 +190,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (x1*a, y1*a, z1*a).
              *
+             * @tparam T2 Other type
              * @param scale Factor used to multiply all components of the vector.
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
@@ -188,6 +202,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (x1*x2, y1*y2, z1*z2).
              *
+             * @tparam T2 Other type
              * @param other Vector used to multiply.
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
@@ -199,6 +214,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (x1/a, y1/a, z1/a).
              *
+             * @tparam T2 Other type
              * @param scale Factor used to divide all components of the vector.
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
@@ -210,6 +226,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (x1/x2, y1/y2, z1/z2).
              *
+             * @tparam T2 Other type
              * @param other Vector used to divide the components of this vector.
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
@@ -221,6 +238,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (x1+x2, y1+y2, z1+z2).
              *
+             * @tparam T2 Other type
              * @param other Vector added to this vector.
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
@@ -232,6 +250,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (x1+a, y1+a, z1+a).
              *
+             * @tparam T2 Other type
              * @param factor Factor added to all components of the vector.
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
@@ -239,22 +258,24 @@ namespace AGPTracer { namespace Entities {
             constexpr auto operator+=(T2 factor) -> const Vec3<T>&;
 
             /**
-             * @brief In-place substracts a vector from this vector.
+             * @brief In-place subtracts a vector from this vector.
              *
              * Becomes (x1-x2, y1-y2, z1-z2).
              *
-             * @param other Vector to substract from this vector.
+             * @tparam T2 Other type
+             * @param other Vector to subtract from this vector.
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
             template<class T2>
             constexpr auto operator-=(const Vec3<T2>& other) -> const Vec3<T>&;
 
             /**
-             * @brief In-place substracts a factor from all components of the vector.
+             * @brief In-place subtracts a factor from all components of the vector.
              *
              * Becomes (x1-a, y1-a, z1-a).
              *
-             * @param factor Factor substracted from all components of the vector.
+             * @tparam T2 Other type
+             * @param factor Factor subtracted from all components of the vector.
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
             template<class T2>
@@ -265,6 +286,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (min(x1, x2), min(y1, y2), min(z1, z2))
              *
+             * @tparam T2 Other type
              * @param other Vector to calculate minimum components with.
              * @return Vec3& Reference to the vector, used to chain operations.
              */
@@ -276,6 +298,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (min(x1, a), min(y1, a), min(z1, a))
              *
+             * @tparam T2 Other type
              * @param other Factor to calculate minimum with.
              * @return Vec3& Reference to the vector, used to chain operations.
              */
@@ -287,6 +310,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (max(x1, x2), max(y1, y2), max(z1, z2))
              *
+             * @tparam T2 Other type
              * @param other Vector to calculate maximum components with.
              * @return Vec3& Reference to the vector, used to chain operations.
              */
@@ -298,6 +322,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (max(x1, a), max(y1, a), max(z1, a))
              *
+             * @tparam T2 Other type
              * @param other Factor to calculate maximum with.
              * @return Vec3& Reference to the vector, used to chain operations.
              */
@@ -309,6 +334,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (min(x1, x2), min(y1, y2), min(z1, z2))
              *
+             * @tparam T2 Other type
              * @param other Vector to calculate minimum components with.
              * @return Vec3 Reference to the vector, used to chain operations.
              */
@@ -321,6 +347,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (min(x1, a), min(y1, a), min(z1, a))
              *
+             * @tparam T2 Other type
              * @param other Factor to calculate minimum with.
              * @return Vec3 Reference to the vector, used to chain operations.
              */
@@ -332,6 +359,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (max(x1, x2), max(y1, y2), max(z1, z2))
              *
+             * @tparam T2 Other type
              * @param other Vector to calculate maximum components with.
              * @return Vec3 Reference to the vector, used to chain operations.
              */
@@ -344,6 +372,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (max(x1, a), max(y1, a), max(z1, a))
              *
+             * @tparam T2 Other type
              * @param other Factor to calculate maximum with.
              * @return Vec3 Reference to the vector, used to chain operations.
              */
@@ -357,7 +386,7 @@ namespace AGPTracer { namespace Entities {
              *
              * @return T Magnitude of the vector.
              */
-            constexpr auto magnitude() const -> T;
+            auto magnitude() const -> T; // In c++26 sqrt is constexpr
 
             /**
              * @brief Returns the squared magnitude of the vector.
@@ -376,7 +405,7 @@ namespace AGPTracer { namespace Entities {
              *
              * @return Vec3 Normalized vector.
              */
-            constexpr auto normalize() const -> Vec3<T>;
+            auto normalize() const -> Vec3<T>; // In c++26 sqrt is constexpr
 
             /**
              * @brief Normalizes the vector in-place, dividing it by its norm.
@@ -385,13 +414,14 @@ namespace AGPTracer { namespace Entities {
              *
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
-            constexpr auto normalize_inplace() -> const Vec3<T>&;
+            auto normalize_inplace() -> const Vec3<T>&; // In c++26 sqrt is constexpr
 
             /**
              * @brief Computes the dot product of this vector and another.
              *
              * Returns v1.v2
              *
+             * @tparam T2 Other type
              * @param other Vector to dot with this one.
              * @return T Dot product of the two vectors.
              */
@@ -403,6 +433,8 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns v1 x v2.
              *
+             * @tparam T2 Other type
+             * @tparam T2 Other type
              * @param other Vector to cross with this one.
              * @return Vec3 Cross product of the two vectors.
              */
@@ -416,7 +448,7 @@ namespace AGPTracer { namespace Entities {
              *
              * @return const Vec3& Reference to the vector, used to chain operations.
              */
-            constexpr auto to_sph() -> const Vec3<T>&;
+            auto to_sph() -> const Vec3<T>&; // In c++26 sqrt is constexpr
 
             /**
              * @brief Changes the vector in-place to cartesian coordinates.
@@ -432,6 +464,9 @@ namespace AGPTracer { namespace Entities {
              *
              * Assumes the vector is in spherical coordinates.
              *
+             * @tparam T2 Type for x reference
+             * @tparam T3 Type for y reference
+             * @tparam T4 Type for z reference
              * @param ref1 Axis used for x.
              * @param ref2 Axis used for y.
              * @param ref3 Axis used for z.
@@ -447,7 +482,7 @@ namespace AGPTracer { namespace Entities {
              *
              * @return Vec3 Spherical coordinates of the vector.
              */
-            constexpr auto get_sph() const -> Vec3<T>;
+            auto get_sph() const -> Vec3<T>; // In c++26 sqrt is constexpr
 
             /**
              * @brief Returns the vector in cartesian coordinates.
@@ -463,6 +498,9 @@ namespace AGPTracer { namespace Entities {
              *
              * Assumes the vector is in spherical coordinates.
              *
+             * @tparam T2 Type for x reference
+             * @tparam T3 Type for y reference
+             * @tparam T4 Type for z reference
              * @param ref1 Axis used for x.
              * @param ref2 Axis used for y.
              * @param ref3 Axis used for z.
@@ -488,7 +526,7 @@ namespace AGPTracer { namespace Entities {
              *
              * @return Vec3 Vector made of the square root of all components of the vector.
              */
-            constexpr auto sqrt() const -> Vec3<decltype(std::sqrt(std::declval<T>()))>;
+            auto sqrt() const -> Vec3<decltype(cl::sycl::sqrt(std::declval<T>()))>; // In c++26 sqrt is constexpr
 
             /**
              * @brief Returns a vector of the exponential of all components of the vector.
@@ -504,6 +542,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Returns (x^a, y^a, z^a).
              *
+             * @tparam T2 Other type
              * @param exp Power to be applied to all components.
              * @return Vec3 Vector made of the components of the vector to the specified power.
              */
@@ -515,6 +554,7 @@ namespace AGPTracer { namespace Entities {
              *
              * Becomes (x^a, y^a, z^a).
              *
+             * @tparam T2 Other type
              * @param exp Power to be applied to all components.
              * @return Vec3& Reference to the vector, used to chain operations.
              */
@@ -551,6 +591,8 @@ namespace AGPTracer { namespace Entities {
             /**
              * @brief In-place limits the components of the vector to a minimum and maximum value.
              *
+             * @tparam T2 Type for minimum
+             * @tparam T3 Type for maximum
              * @param minimum Minimum value of the components.
              * @param maximum Maximum value of the components.
              * @return Vec3& Reference to the vector, used to chain operations.
@@ -668,6 +710,7 @@ namespace AGPTracer { namespace Entities {
 /**
  * @brief Formats a vector to be displayed.
  *
+ * @tparam T Vector type
  * @param output Output stream.
  * @param v Vector to be displayed.
  * @return std::ostream& Output stream.
@@ -680,6 +723,8 @@ auto operator<<(std::ostream& output, const AGPTracer::Entities::Vec3<T>& v) -> 
  *
  * Returns (a*x, a*y, a*z).
  *
+ * @tparam T Vector type
+ * @tparam T2 Other type
  * @param factor Factor multiplying the vector.
  * @param v Vector to be multiplied.
  * @return AGPTracer::Entities::Vec3 Resulting Vector, (a*x, a*y, a*z).
@@ -692,6 +737,8 @@ constexpr auto operator*(const T2 factor, const AGPTracer::Entities::Vec3<T>& v)
  *
  * Returns (a/x, a/y, a/z).
  *
+ * @tparam T Vector type
+ * @tparam T2 Other type
  * @param factor Factor divided by the vector.
  * @param v Vector to be divided by.
  * @return AGPTracer::Entities::Vec3 Resulting Vector, (a/x, a/y, a/z).
@@ -704,6 +751,8 @@ constexpr auto operator/(const T2 factor, const AGPTracer::Entities::Vec3<T>& v)
  *
  * Returns (a+x, a+y, a+z).
  *
+ * @tparam T Vector type
+ * @tparam T2 Other type
  * @param factor Factor added to the vector.
  * @param v Vector to be added.
  * @return AGPTracer::Entities::Vec3 Resulting Vector, (a+x, a+y, a+z).
@@ -712,12 +761,14 @@ template<class T, class T2>
 constexpr auto operator+(const T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() + std::declval<T>())>;
 
 /**
- * @brief Substracts a vector from a factor.
+ * @brief Subtracts a vector from a factor.
  *
  * Returns (a-x, a-y, a-z).
  *
- * @param factor Factor substracted by the vector.
- * @param v Vector to be substracted.
+ * @tparam T Vector type
+ * @tparam T2 Other type
+ * @param factor Factor subtracted by the vector.
+ * @param v Vector to be subtracted.
  * @return AGPTracer::Entities::Vec3 Resulting Vector, (a-x, a-y, a-z).
  */
 template<class T, class T2>

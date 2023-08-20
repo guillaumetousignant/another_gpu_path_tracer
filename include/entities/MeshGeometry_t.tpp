@@ -1,15 +1,11 @@
-#include "entities/MeshGeometry_t.hpp"
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
 
-using AGPTracer::Entities::MeshGeometry_t;
-using AGPTracer::Entities::Vec3;
-
-MeshGeometry_t::MeshGeometry_t(const std::filesystem::path& filename) {
+template<typename T>
+AGPTracer::Entities::MeshGeometry_t<T>::MeshGeometry_t(const std::filesystem::path& filename) {
     const std::filesystem::path ext = filename.extension();
     if (ext == ".obj") {
         readObj(filename);
@@ -23,7 +19,8 @@ MeshGeometry_t::MeshGeometry_t(const std::filesystem::path& filename) {
     }
 }
 
-auto MeshGeometry_t::readObj(const std::filesystem::path& filename) -> void {
+template<typename T>
+auto AGPTracer::Entities::MeshGeometry_t<T>::readObj(const std::filesystem::path& filename) -> void {
     size_t nv  = 0;
     size_t nvt = 0;
     size_t nvn = 0;
@@ -66,13 +63,13 @@ auto MeshGeometry_t::readObj(const std::filesystem::path& filename) -> void {
     size_t v_counter  = 0;
     size_t vt_counter = 0;
     size_t vn_counter = 0;
-    double val0;
-    double val1;
-    double val2;
+    T val0;
+    T val1;
+    T val2;
 
-    nodes_               = std::vector<Vec3<double>>(nv);
-    texture_coordinates_ = std::vector<std::array<double, 2>>(nvt);
-    normals_             = std::vector<Vec3<double>>(nvn);
+    nodes_               = std::vector<AGPTracer::Entities::Vec3<T>>(nv);
+    texture_coordinates_ = std::vector<std::array<T, 2>>(nvt);
+    normals_             = std::vector<AGPTracer::Entities::Vec3<T>>(nvn);
 
     meshfile.clear();
     meshfile.seekg(0, std::ios::beg);
@@ -83,7 +80,7 @@ auto MeshGeometry_t::readObj(const std::filesystem::path& filename) -> void {
 
         if (token == "v") {
             liness >> val0 >> val1 >> val2;
-            nodes_[v_counter] = Vec3<double>(val0, val1, val2);
+            nodes_[v_counter] = AGPTracer::Entities::Vec3<T>(val0, val1, val2);
             ++v_counter;
         }
         else if (token == "vt") {
@@ -93,7 +90,7 @@ auto MeshGeometry_t::readObj(const std::filesystem::path& filename) -> void {
         }
         else if (token == "vn") {
             liness >> val0 >> val1 >> val2;
-            normals_[vn_counter] = Vec3<double>(val0, val1, val2);
+            normals_[vn_counter] = AGPTracer::Entities::Vec3<T>(val0, val1, val2);
             ++vn_counter;
         }
     }
@@ -179,7 +176,8 @@ auto MeshGeometry_t::readObj(const std::filesystem::path& filename) -> void {
     build_missing_texture_coordinates(missing_texture_coordinates);
 }
 
-auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
+template<typename T>
+auto AGPTracer::Entities::MeshGeometry_t<T>::readSU2(const std::filesystem::path& filename) -> void {
     size_t nv = 0;
     size_t nf = 0;
     std::string line;
@@ -230,12 +228,12 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
 
     // Getting normals, vertex coordinates and texture coordinates
     size_t v_counter = 0;
-    double val0;
-    double val1;
-    double val2;
+    T val0;
+    T val1;
+    T val2;
     bool points_started = false;
 
-    nodes_ = std::vector<Vec3<double>>(nv);
+    nodes_ = std::vector<AGPTracer::Entities::Vec3<T>>(nv);
 
     meshfile.clear();
     meshfile.seekg(0, std::ios::beg);
@@ -260,7 +258,7 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
         if (points_started && (!token.empty())) {
             std::istringstream liness2(line);
             liness2 >> val0 >> val1 >> val2;
-            nodes_[v_counter] = Vec3<double>(val0, val1, val2);
+            nodes_[v_counter] = AGPTracer::Entities::Vec3<T>(val0, val1, val2);
             ++v_counter;
         }
     }
@@ -274,8 +272,8 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
 
     const size_t n_tris       = nf;
     mat_                      = std::vector<std::string>(n_tris);
-    normals_                  = std::vector<Vec3<double>>(3 * n_tris);
-    texture_coordinates_      = std::vector<std::array<double, 2>>(3 * n_tris);
+    normals_                  = std::vector<AGPTracer::Entities::Vec3<T>>(3 * n_tris);
+    texture_coordinates_      = std::vector<std::array<T, 2>>(3 * n_tris);
     face_nodes_               = std::vector<std::array<size_t, 3>>(n_tris);
     face_texture_coordinates_ = std::vector<std::array<size_t, 3>>(n_tris);
     face_normals_             = std::vector<std::array<size_t, 3>>(n_tris);
@@ -308,8 +306,8 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
                     liness >> tokens[i];
                     face_nodes_[f_counter][i]               = tokens[i];
                     mat_[f_counter]                         = material;
-                    normals_[3 * f_counter + i]             = Vec3<double>(0.0); // CHECK fill
-                    texture_coordinates_[3 * f_counter + i] = std::array<double, 2>{0.0, 0.0};
+                    normals_[3 * f_counter + i]             = AGPTracer::Entities::Vec3<T>(0.0); // CHECK fill
+                    texture_coordinates_[3 * f_counter + i] = std::array<T, 2>{0.0, 0.0};
                     face_texture_coordinates_[f_counter][i] = 3 * f_counter + i;
                     face_normals_[f_counter][i]             = 3 * f_counter + i;
                 }
@@ -320,8 +318,8 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
                     liness >> tokens[i];
                     face_nodes_[f_counter][i]               = tokens[i];
                     mat_[f_counter]                         = material;
-                    normals_[3 * f_counter + i]             = Vec3<double>(0.0); // CHECK fill
-                    texture_coordinates_[3 * f_counter + i] = std::array<double, 2>{0.0, 0.0};
+                    normals_[3 * f_counter + i]             = AGPTracer::Entities::Vec3<T>(0.0); // CHECK fill
+                    texture_coordinates_[3 * f_counter + i] = std::array<T, 2>{0.0, 0.0};
                     face_texture_coordinates_[f_counter][i] = 3 * f_counter + i;
                     face_normals_[f_counter][i]             = 3 * f_counter + i;
                 }
@@ -331,8 +329,8 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
                 for (unsigned int i = 0; i < 3; ++i) {
                     face_nodes_[f_counter][i]               = tokens[i];
                     mat_[f_counter]                         = material;
-                    normals_[3 * f_counter + i]             = Vec3<double>(0.0); // CHECK fill
-                    texture_coordinates_[3 * f_counter + i] = std::array<double, 2>{0.0, 0.0};
+                    normals_[3 * f_counter + i]             = AGPTracer::Entities::Vec3<T>(0.0); // CHECK fill
+                    texture_coordinates_[3 * f_counter + i] = std::array<T, 2>{0.0, 0.0};
                     face_texture_coordinates_[f_counter][i] = 3 * f_counter + i;
                     face_normals_[f_counter][i]             = 3 * f_counter + i;
                 }
@@ -351,7 +349,8 @@ auto MeshGeometry_t::readSU2(const std::filesystem::path& filename) -> void {
     meshfile.close();
 }
 
-auto MeshGeometry_t::build_missing_normals(const std::vector<std::array<bool, 3>>& normals_to_build) -> void {
+template<typename T>
+auto AGPTracer::Entities::MeshGeometry_t<T>::build_missing_normals(const std::vector<std::array<bool, 3>>& normals_to_build) -> void {
     size_t normals_to_add = 0;
     for (size_t i = 0; i < normals_to_build.size(); ++i) {
         for (size_t j = 0; j < normals_to_build[i].size(); ++j) {
@@ -388,7 +387,8 @@ auto MeshGeometry_t::build_missing_normals(const std::vector<std::array<bool, 3>
     }
 }
 
-auto MeshGeometry_t::build_missing_texture_coordinates(const std::vector<std::array<bool, 3>>& texture_coordinates_to_build) -> void {
+template<typename T>
+auto AGPTracer::Entities::MeshGeometry_t<T>::build_missing_texture_coordinates(const std::vector<std::array<bool, 3>>& texture_coordinates_to_build) -> void {
     bool texture_coordinates_to_add = false;
     for (size_t i = 0; i < texture_coordinates_to_build.size(); ++i) {
         for (size_t j = 0; j < texture_coordinates_to_build[i].size(); ++j) {
@@ -400,7 +400,7 @@ auto MeshGeometry_t::build_missing_texture_coordinates(const std::vector<std::ar
     }
 
     if (texture_coordinates_to_add) {
-        texture_coordinates_.emplace_back(std::array<double, 2>{0.0, 0.0});
+        texture_coordinates_.emplace_back(std::array<T, 2>{0.0, 0.0});
         for (size_t i = 0; i < texture_coordinates_to_build.size(); ++i) {
             for (size_t j = 0; j < texture_coordinates_to_build[i].size(); ++j) {
                 if (texture_coordinates_to_build[i][j]) {

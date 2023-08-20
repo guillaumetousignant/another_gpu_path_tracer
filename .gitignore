@@ -46,3 +46,6 @@
 /docs/html/*
 /build/*
 /install/*
+
+# Python virtual environment
+/env/*

@@ -217,8 +217,8 @@ constexpr auto AGPTracer::Entities::Vec3<T>::getMax(T2 other) const -> Vec3<decl
 }
 
 template<typename T>
-constexpr auto AGPTracer::Entities::Vec3<T>::magnitude() const -> T {
-    return std::sqrt(v_[0] * v_[0] + v_[1] * v_[1] + v_[2] * v_[2]);
+auto AGPTracer::Entities::Vec3<T>::magnitude() const -> T { // In c++26 sqrt is constexpr
+    return cl::sycl::sqrt(v_[0] * v_[0] + v_[1] * v_[1] + v_[2] * v_[2]);
 }
 
 template<typename T>
@@ -227,13 +227,13 @@ constexpr auto AGPTracer::Entities::Vec3<T>::magnitudeSquared() const -> T {
 }
 
 template<typename T>
-constexpr auto AGPTracer::Entities::Vec3<T>::normalize() const -> Vec3<T> {
+auto AGPTracer::Entities::Vec3<T>::normalize() const -> Vec3<T> { // In c++26 sqrt is constexpr
     const T m = magnitude();
     return {v_[0] / m, v_[1] / m, v_[2] / m};
 }
 
 template<typename T>
-constexpr auto AGPTracer::Entities::Vec3<T>::normalize_inplace() -> const Vec3<T>& {
+auto AGPTracer::Entities::Vec3<T>::normalize_inplace() -> const Vec3<T>& { // In c++26 sqrt is constexpr
     const T m = magnitude();
     v_[0] /= m;
     v_[1] /= m;
@@ -254,7 +254,7 @@ constexpr auto AGPTracer::Entities::Vec3<T>::cross(const Vec3<T2>& other) const 
 }
 
 template<typename T>
-constexpr auto AGPTracer::Entities::Vec3<T>::to_sph() -> const Vec3<T>& { // CHECK outputs nan
+auto AGPTracer::Entities::Vec3<T>::to_sph() -> const Vec3<T>& { // CHECK outputs nan  // In c++26 sqrt is constexpr
     // [r, theta, phi] (theta is polar angle)
     const T temp = std::atan2(v_[1], v_[0]);
     v_[0]        = magnitude();
@@ -284,7 +284,7 @@ constexpr auto AGPTracer::Entities::Vec3<T>::to_xyz_offset(const Vec3<T2>& ref1,
 }
 
 template<typename T>
-constexpr auto AGPTracer::Entities::Vec3<T>::get_sph() const -> Vec3<T> {
+auto AGPTracer::Entities::Vec3<T>::get_sph() const -> Vec3<T> { // In c++26 sqrt is constexpr
     const T r = magnitude();
     return {r, (std::abs(r) >= std::numeric_limits<T>::min()) ? std::acos(v_[2] / r) : T{0}, std::atan2(v_[1], v_[0])};
 }
@@ -307,8 +307,8 @@ constexpr auto AGPTracer::Entities::Vec3<T>::ln() const -> Vec3<decltype(std::lo
 }
 
 template<typename T>
-constexpr auto AGPTracer::Entities::Vec3<T>::sqrt() const -> Vec3<decltype(std::sqrt(std::declval<T>()))> {
-    return {std::sqrt(v_[0]), std::sqrt(v_[1]), std::sqrt(v_[2])};
+auto AGPTracer::Entities::Vec3<T>::sqrt() const -> Vec3<decltype(cl::sycl::sqrt(std::declval<T>()))> { // In c++26 sqrt is constexpr
+    return {cl::sycl::sqrt(v_[0]), cl::sycl::sqrt(v_[1]), cl::sycl::sqrt(v_[2])};
 }
 
 template<typename T>

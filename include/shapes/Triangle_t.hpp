@@ -18,7 +18,10 @@ namespace AGPTracer { namespace Shapes {
      *
      * A triangle is defined by three points, in counter-clockwise order. Its transformation matrix is used
      * to modify those points.
+     *
+     * @tparam T Floating point datatype to use
      */
+    template<typename T = double>
     class Triangle_t {
         public:
             /**
@@ -29,34 +32,32 @@ namespace AGPTracer { namespace Shapes {
              * @param normals Array of three normals, in counter-clockwise order, at the three points of the triangle.
              * @param texcoord Array of three texture coordinates with two components, in counter-clockwise order, at the three points of the triangle. [x0, y0, x1, y1, x2, y2]
              */
-            Triangle_t(/*Material_t *material,*/ std::array<AGPTracer::Entities::Vec3<double>, 3> points,
-                       const std::optional<std::array<AGPTracer::Entities::Vec3<double>, 3>> normals,
-                       const std::optional<std::array<double, 6>> texcoord);
+            Triangle_t(/*Material_t *material,*/ std::array<AGPTracer::Entities::Vec3<T>, 3> points,
+                       const std::optional<std::array<AGPTracer::Entities::Vec3<T>, 3>> normals,
+                       const std::optional<std::array<T, 6>> texcoord); // In c++26 sqrt is constexpr
 
             // Material_t *material_; /**< @brief Material of which the shape is made of.*/
-            AGPTracer::Entities::TransformMatrix_t transformation_; /**< @brief Transformation matrix used to modify the position and other transformations of the shape.*/
-            std::array<AGPTracer::Entities::Vec3<double>, 3>
+            AGPTracer::Entities::TransformMatrix_t<T> transformation_; /**< @brief Transformation matrix used to modify the position and other transformations of the shape.*/
+            std::array<AGPTracer::Entities::Vec3<T>, 3>
                 points_orig_; /**< @brief Array of the three un-transformed points of the triangle, in counter-clockwise order. Transformed by the transform matrix on update to give points.*/
-            std::array<AGPTracer::Entities::Vec3<double>, 3>
+            std::array<AGPTracer::Entities::Vec3<T>, 3>
                 normals_orig_; /**< @brief Array of the three un-transformed normals of the triangle, in counter-clockwise order. Transformed by the transform matrix on update to give normals.*/
-            std::array<double, 6> texture_coordinates_; /**< @brief Array of the three texture coordinates with two components of the triangle, in counter-clockwise order. Transformed by the transform
+            std::array<T, 6> texture_coordinates_; /**< @brief Array of the three texture coordinates with two components of the triangle, in counter-clockwise order. Transformed by the transform
                                                            matrix on update to give texture coordinates. [x0, y0, x1, y1, x2, y2]*/
-            std::array<AGPTracer::Entities::Vec3<double>, 3> points_; /**< @brief Array of the three points of the triangle, in counter-clockwise order.*/
-            std::array<AGPTracer::Entities::Vec3<double>, 3> normals_; /**< @brief Array of the three  normals of the triangle, in counter-clockwise order.*/
-            AGPTracer::Entities::Vec3<double> v0v1_; /**< @brief Cached vector from point 0 to point 1. Used for intersection.*/
-            AGPTracer::Entities::Vec3<double> v0v2_; /**< @brief Cached vector from point 0 to point 2. Used for intersection.*/
-            std::array<double, 2> tuv_to_world_; /**< @brief Matrix to change referential from texture coordinate space to world space. Used to compute tangent vector.*/
-            AGPTracer::Entities::Vec3<double> tangent_vec_; /**< @brief Tangent vector of the triangle in world space. Points to positive u in texture coordinates. Used for normal mapping.*/
+            std::array<AGPTracer::Entities::Vec3<T>, 3> points_; /**< @brief Array of the three points of the triangle, in counter-clockwise order.*/
+            std::array<AGPTracer::Entities::Vec3<T>, 3> normals_; /**< @brief Array of the three  normals of the triangle, in counter-clockwise order.*/
+            AGPTracer::Entities::Vec3<T> v0v1_; /**< @brief Cached vector from point 0 to point 1. Used for intersection.*/
+            AGPTracer::Entities::Vec3<T> v0v2_; /**< @brief Cached vector from point 0 to point 2. Used for intersection.*/
+            std::array<T, 2> tuv_to_world_; /**< @brief Matrix to change referential from texture coordinate space to world space. Used to compute tangent vector.*/
+            AGPTracer::Entities::Vec3<T> tangent_vec_; /**< @brief Tangent vector of the triangle in world space. Points to positive u in texture coordinates. Used for normal mapping.*/
 
-            SYCL_EXTERNAL
             /**
              * @brief Updates the triangle's points from its transformation matrix.
              *
              * The points are created from the transformation matrix and the original points, stored in normals_orig_.
              */
-            auto update() -> void;
+            auto update() -> void; // In c++26 sqrt is constexpr
 
-            SYCL_EXTERNAL
             /**
              * @brief Intersects a ray with the triangle, and stores information about the intersection.
              *
@@ -70,9 +71,8 @@ namespace AGPTracer { namespace Shapes {
              * @return true The ray intersected the triangle, t and uv are defined.
              * @return false The ray doesn't intersect the triangle, t and uv are undefined.
              */
-            auto intersection(const AGPTracer::Entities::Ray_t& ray, double& t, std::array<double, 2>& uv) const -> bool;
+            constexpr auto intersection(const AGPTracer::Entities::Ray_t<T>& ray, T& t, std::array<T, 2>& uv) const -> bool;
 
-            SYCL_EXTERNAL
             /**
              * @brief Returns the surface normal and texture coordinates at a point in object coordinates.
              *
@@ -84,11 +84,11 @@ namespace AGPTracer { namespace Shapes {
              * @param[in] time Time at which we want the normal and texture coordinates. Not used here.
              * @param[in] uv Object coordinates at which we want to find the normal and texture coordinates. The coordinates are in barycentric coordinates, minus w [u, v].
              * @param[out] tuv Texture coordinates at the specified coordinates.
-             * @return AGPTracer::Entities::Vec3<double> Normal vector at the specified coordinates.
+             * @return AGPTracer::Entities::Vec3<T> Normal vector at the specified coordinates.
              */
-            auto normaluv(double time, std::array<double, 2> uv, std::array<double, 2>& tuv) const -> AGPTracer::Entities::Vec3<double>;
+            template<class T2>
+            constexpr auto normaluv(T2 time, std::array<T, 2> uv, std::array<T, 2>& tuv) const -> AGPTracer::Entities::Vec3<T>;
 
-            SYCL_EXTERNAL
             /**
              * @brief Returns the surface normal at a point in object coordinates.
              *
@@ -98,11 +98,11 @@ namespace AGPTracer { namespace Shapes {
              *
              * @param[in] time Time at which we want the normal. Used when motion blur is used. Not used here.
              * @param[in] uv Object coordinates at which we want to find the normal. The coordinates are in barycentric coordinates, minus w [u, v].
-             * @return AGPTracer::Entities::Vec3<double> Normal vector at the specified coordinates.
+             * @return AGPTracer::Entities::Vec3<T> Normal vector at the specified coordinates.
              */
-            auto normal(double time, std::array<double, 2> uv) const -> AGPTracer::Entities::Vec3<double>;
+            template<class T2>
+            constexpr auto normal(T2 time, std::array<T, 2> uv) const -> AGPTracer::Entities::Vec3<T>;
 
-            SYCL_EXTERNAL
             /**
              * @brief Returns the surface normal, texture coordinates and tangent vector at a point in object coordinates.
              *
@@ -116,42 +116,44 @@ namespace AGPTracer { namespace Shapes {
              * @param[in] uv Object coordinates at which we want to find the normal, texture coordinates and tangent vector. The coordinates are in barycentric coordinates, minus w [u, v].
              * @param[out] tuv Texture coordinates at the specified coordinates.
              * @param[out] tangentvec Tangent vector at the specified coordinates.
-             * @return AGPTracer::Entities::Vec3<double> Normal vector at the specified coordinates.
+             * @return AGPTracer::Entities::Vec3<T> Normal vector at the specified coordinates.
              */
-            auto normal_uv_tangent(double time, std::array<double, 2> uv, std::array<double, 2>& tuv, AGPTracer::Entities::Vec3<double>& tangentvec) const -> AGPTracer::Entities::Vec3<double>;
+            template<class T2>
+            auto normal_uv_tangent(T2 time, std::array<T, 2> uv, std::array<T, 2>& tuv, AGPTracer::Entities::Vec3<T>& tangentvec) const -> AGPTracer::Entities::Vec3<T>; // In c++26 sqrt is constexpr
 
-            SYCL_EXTERNAL
             /**
              * @brief Returns the geometric surface normal of the triangle, not the interpolated one from vertex normals.
              *
              * Not used anywhere usually, used to debug normal interpolation.
              *
              * @param time Time at which we want the normal. Used when motion blur is used. Not used here.
-             * @return AGPTracer::Entities::Vec3<double> Normal vector of the triangle.
+             * @return AGPTracer::Entities::Vec3<T> Normal vector of the triangle.
              */
-            auto normal_face(double time) const -> AGPTracer::Entities::Vec3<double>;
+            template<class T2>
+            auto normal_face(T2 time) const -> AGPTracer::Entities::Vec3<T>; // In c++26 sqrt is constexpr
 
-            SYCL_EXTERNAL
             /**
              * @brief Minimum coordinates of an axis-aligned bounding box around the triangle.
              *
              * This is used by acceleration structures to spatially sort shapes. Returns the minimum of all
              * three points for all axes.
              *
-             * @return AGPTracer::Entities::Vec3<double> Minimum coordinates of an axis-aligned bounding box around the triangle.
+             * @return AGPTracer::Entities::Vec3<T> Minimum coordinates of an axis-aligned bounding box around the triangle.
              */
-            auto mincoord() const -> AGPTracer::Entities::Vec3<double>;
+            constexpr auto mincoord() const -> AGPTracer::Entities::Vec3<T>;
 
-            SYCL_EXTERNAL
             /**
              * @brief Maximum coordinates of an axis-aligned bounding box around the triangle.
              *
              * This is used by acceleration structures to spatially sort shapes. Returns the minimum of all
              * three points for all axes.
              *
-             * @return AGPTracer::Entities::Vec3<double> Maximum coordinates of an axis-aligned bounding box around the triangle.
+             * @return AGPTracer::Entities::Vec3<T> Maximum coordinates of an axis-aligned bounding box around the triangle.
              */
-            auto maxcoord() const -> AGPTracer::Entities::Vec3<double>;
+            constexpr auto maxcoord() const -> AGPTracer::Entities::Vec3<T>;
     };
 }}
+
+#include "shapes/Triangle_t.tpp"
+
 #endif

@@ -15,7 +15,10 @@ namespace AGPTracer { namespace Entities {
      * This is the main class of the program. It describes a ray with a position and a direction.
      * It also has colour data. It can be intersected with shapes or any intersectable object.
      * It holds a list a mediums to figure out in what material it is.
+     *
+     * @tparam T Floating point datatype to use
      */
+    template<typename T = double>
     class Ray_t {
         public:
             /**
@@ -28,7 +31,7 @@ namespace AGPTracer { namespace Entities {
              * by materials.
              * @param[in] medium_list Initial list of materials through which the ray is travelling. Should have at least two copies of an "outside" medium not assigned to any object (issue #25).
              */
-            Ray_t(const Vec3<double>& origin, const Vec3<double>& direction, const Vec3<double>& colour, const Vec3<double>& mask); //, std::list<Medium_t*> medium_list);
+            constexpr Ray_t(const Vec3<T>& origin, const Vec3<T>& direction, const Vec3<T>& colour, const Vec3<T>& mask /*std::list<Medium_t*> medium_list*/);
 
             /**
              * @brief Construct a new Ray_t object with a  time.
@@ -41,16 +44,16 @@ namespace AGPTracer { namespace Entities {
              * @param[in] medium_list Initial list of materials through which the ray is travelling. Should have at least two copies of an "outside" medium not assigned to any object (issue #25).
              * @param[in] time Time at which the ray is emitted. From 0 for exposure start to 1 for exposure end.
              */
-            Ray_t(const Vec3<double>& origin, const Vec3<double>& direction, const Vec3<double>& colour, const Vec3<double>& mask, double time); //, std::list<Medium_t*> medium_list, double time);
+            constexpr Ray_t(const Vec3<T>& origin, const Vec3<T>& direction, const Vec3<T>& colour, const Vec3<T>& mask, /*std::list<Medium_t*> medium_list*/ T time);
 
-            Vec3<double> origin_; /**< @brief Origin of the ray. Changed by materials on bounce.*/
-            Vec3<double> direction_; /**< @brief Direction of the ray. Changed by materials on bounce.*/
-            Vec3<double> colour_; /**< @brief Colour accumulated by the ray. Changed by emissive materials. Starts at [0 0 0].*/
-            Vec3<double> mask_; /**< @brief Part of the ray not yet absorbed by materials. Multiplies the emission of materials to set colour. Starts at [1 1 1], the colour can't be changed once the
+            Vec3<T> origin_; /**< @brief Origin of the ray. Changed by materials on bounce.*/
+            Vec3<T> direction_; /**< @brief Direction of the ray. Changed by materials on bounce.*/
+            Vec3<T> colour_; /**< @brief Colour accumulated by the ray. Changed by emissive materials. Starts at [0 0 0].*/
+            Vec3<T> mask_; /**< @brief Part of the ray not yet absorbed by materials. Multiplies the emission of materials to set colour. Starts at [1 1 1], the colour can't be changed once the
                                    mask reaches 0.*/
-            double dist_; /**< @brief Distance traveled by the ray since last bounce.*/
+            T dist_; /**< @brief Distance traveled by the ray since last bounce.*/
             // std::list <Medium_t*> medium_list_; /**< @brief List of materials in which the ray travels. The first one is the current one.*/
-            double time_; /**< @brief Time of emission of the ray, relative to exposure time. 0 for start of exposure to 1 for end.*/
+            T time_; /**< @brief Time of emission of the ray, relative to exposure time. 0 for start of exposure to 1 for end.*/
 
             /**
              * @brief Intersects the ray with objects in the scene and bounces it on their material.
@@ -70,7 +73,7 @@ namespace AGPTracer { namespace Entities {
             // auto raycast(const Scene_t* scene, unsigned int max_bounces, const Skybox_t* skybox) -> void;
 
             /**
-             * @brief Adds a medium to a ray's list of mediums, accordint to the medium's priority.
+             * @brief Adds a medium to a ray's list of mediums, according to the medium's priority.
              *
              * Adds a medium to a ray's list of mediums. The input medium will be added before the first
              * medium from the list which has a priority equal or superior to the input medium's
@@ -92,5 +95,7 @@ namespace AGPTracer { namespace Entities {
             // auto remove_from_mediums(Medium_t* medium) -> void;
     };
 }}
+
+#include "entities/Ray_t.tpp"
 
 #endif

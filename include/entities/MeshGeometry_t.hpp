@@ -15,7 +15,10 @@ namespace AGPTracer { namespace Entities {
      * Mesh geometries represent a single geometry without any transformation. Multiple meshes can point to the same mesh geometry
      * while using different transformations, enabling instantiating and saving ressources. This class is constructed from geometry
      * input files. Currently, .obj and .su2 files are supported.
+     *
+     * @tparam T Floating point datatype to use
      */
+    template<typename T = double>
     class MeshGeometry_t {
         public:
             /**
@@ -28,9 +31,9 @@ namespace AGPTracer { namespace Entities {
              */
             MeshGeometry_t(const std::filesystem::path& filename);
 
-            std::vector<Vec3<double>> nodes_; /**< @brief Array of nodes in the mesh.*/
-            std::vector<Vec3<double>> normals_; /**< @brief Array of normals in the mesh.*/
-            std::vector<std::array<double, 2>> texture_coordinates_; /**< @brief Array of 2D uv coordinates in the mesh.*/
+            std::vector<Vec3<T>> nodes_; /**< @brief Array of nodes in the mesh.*/
+            std::vector<Vec3<T>> normals_; /**< @brief Array of normals in the mesh.*/
+            std::vector<std::array<T, 2>> texture_coordinates_; /**< @brief Array of 2D uv coordinates in the mesh.*/
             std::vector<std::string> mat_; /**< @brief Array of strings representing each face's material's name.*/
             std::vector<std::array<size_t, 3>> face_nodes_; /**< @brief Nodes making up each face.*/
             std::vector<std::array<size_t, 3>> face_normals_; /**< @brief Normals of the three corners of each face.*/
@@ -72,5 +75,7 @@ namespace AGPTracer { namespace Entities {
             auto build_missing_texture_coordinates(const std::vector<std::array<bool, 3>>& texture_coordinates_to_build) -> void;
     };
 }}
+
+#include "entities/MeshGeometry_t.tpp"
 
 #endif

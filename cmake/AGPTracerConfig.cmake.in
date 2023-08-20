@@ -1,0 +1,19 @@
+@PACKAGE_INIT@
+
+get_filename_component(AGPTRACER_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+@ZLIB_DEPENDENCY@
+@PNG_DEPENDENCY@
+@JPEG_DEPENDENCY@
+@TIFF_DEPENDENCY@
+list(INSERT CMAKE_FRAMEWORK_PATH 0 /System/Library/Frameworks) # Because CMake doesn't find the correct GLUT on macOS 
+@GLUT_DEPENDENCY@
+@OPENGL_DEPENDENCY@
+@OPENMP_DEPENDENCY@
+
+if(NOT TARGET AGPTracer::AGPTracer)
+    include("${AGPTRACER_CMAKE_DIR}/AGPTracerTargets.cmake")
+endif()
+
+set(AGPTRACER_LIBRARIES AGPTracer::AGPTracer)

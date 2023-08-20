@@ -11,6 +11,8 @@ namespace AGPTracer {
 }
 
 #include "entities/entities.hpp"
-#include "entities/shapes.hpp"
+#include "materials/materials.hpp"
+#include "shapes/shapes.hpp"
+#include "skyboxes/skyboxes.hpp"
 
 #endif

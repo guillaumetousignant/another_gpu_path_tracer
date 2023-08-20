@@ -12,8 +12,11 @@ namespace AGPTracer {
 }
 
 #include "MeshGeometry_t.hpp"
+#include "RandomGenerator_t.hpp"
 #include "Ray_t.hpp"
+#include "Scene_t.hpp"
 #include "TransformMatrix_t.hpp"
 #include "Vec3.hpp"
+
 
 #endif

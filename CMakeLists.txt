@@ -10,8 +10,19 @@ option(USE_OpenSYCL "Use the Open SYCL backend." OFF)
 option(USE_clangSYCL "Use the Intel clang SYCL backend." OFF)
 option(USE_IPO "Use interprocedural optimization." OFF)
 
-project(SYCL_TEST VERSION 1.0.0 LANGUAGES CXX)
+project(SYCL_TEST VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 add_subdirectory(src)
+
+option(BUILD_DOC "Build documentation." OFF)
+if (BUILD_DOC)
+    add_subdirectory(docs)
+endif()
+
+option(BUILD_TESTING "Build all tests." OFF)
+if (BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

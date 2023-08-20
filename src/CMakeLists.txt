@@ -1,13 +1,10 @@
-add_library(AGPTracer "")
+add_library(AGPTracer INTERFACE)
 
-add_subdirectory(entities)
-add_subdirectory(shapes)
-
-target_include_directories(AGPTracer PUBLIC 
+target_include_directories(AGPTracer INTERFACE 
     $<INSTALL_INTERFACE:include/another_gpu_path_tracer/>    
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>)
 
-target_compile_features(AGPTracer PRIVATE cxx_std_20)
+target_compile_features(AGPTracer INTERFACE cxx_std_20)
 if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     set_property(TARGET AGPTracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif()
@@ -34,19 +31,18 @@ if(USE_OpenSYCL)
 
     find_package(OpenSYCL REQUIRED)
     if(WIN32)
-        target_compile_definitions(AGPTracer PUBLIC NOMINMAX)
-        target_compile_definitions(AGPTracer PUBLIC -D_USE_MATH_DEFINES)
+        target_compile_definitions(AGPTracer INTERFACE NOMINMAX)
+        target_compile_definitions(AGPTracer INTERFACE -D_USE_MATH_DEFINES)
     endif()
-    add_sycl_to_target(TARGET AGPTracer SOURCES shapes/Triangle_t.cpp entities/MeshGeometry_t.cpp entities/Ray_t.cpp entities/TransformMatrix_t.cpp)
     add_sycl_to_target(TARGET another_gpu_path_tracer SOURCES main.cpp)
 endif()
 
 if(USE_clangSYCL)
     if (BUILD_CUDA)
-        target_compile_options(AGPTracer PUBLIC -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
-        target_link_options(AGPTracer PUBLIC -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
+        target_compile_options(AGPTracer INTERFACE -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
+        target_link_options(AGPTracer INTERFACE -fsycl -fsycl-targets=nvptx64-nvidia-cuda)
     else()
-        target_compile_options(AGPTracer PUBLIC -fsycl)
-        target_link_options(AGPTracer PUBLIC -fsycl)
+        target_compile_options(AGPTracer INTERFACE -fsycl)
+        target_link_options(AGPTracer INTERFACE -fsycl)
     endif()
 endif()
