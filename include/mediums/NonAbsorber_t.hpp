@@ -2,6 +2,7 @@
 #define AGPTRACER_MEDIUMS_NONABSORBER_T_HPP
 
 #include "entities/Ray_t.hpp"
+#include <random>
 
 namespace AGPTracer { namespace Mediums {
 
@@ -33,14 +34,17 @@ namespace AGPTracer { namespace Mediums {
              *
              * This medium doesn't interact with light, and as such a ray is not changed here.
              *
+             * @tparam R Random generator type to use
              * @tparam N Number of mediums in the ray's medium list
+             * @param rng Random generator used to get random numbers
+             * @param unif Uniform distribution used to get random numbers
              * @param ray Ray modified by the medium. Its colour and mask can be changed.
              * @return true Returns true if the ray has been scattered, meaning that its origin and/or direction has changed and the material bounce should not be performed. Never the case for a non
              * absorber.
              * @return false Returns false when the ray's path has not been changed, and it should bounce on the intersected material as planned. Always the case for a non absorber.
              */
-            template<size_t N>
-            auto scatter(Entities::Ray_t<T, N>& ray) -> bool;
+            template<class R, size_t N>
+            auto scatter(R& rng, std::uniform_real_distribution<T>& unif, Entities::Ray_t<T, N>& ray) const -> bool;
     };
 }}
 

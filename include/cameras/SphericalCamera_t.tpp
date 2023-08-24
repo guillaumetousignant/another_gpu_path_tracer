@@ -24,8 +24,7 @@ requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> AG
         gammaind_(gammaind),
         up_(up),
         up_buffer_(up),
-        image_(std::move(image)),
-        unif_(T{0}, T{1}) {
+        image_(std::move(image)) {
     origin_    = transformation_.multVec(Entities::Vec3<T>());
     direction_ = transformation_.multDir(Entities::Vec3<T>(T{0}, T{1}, T{0}));
 }
@@ -41,7 +40,7 @@ requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> au
 template<typename T, template<typename> typename K, template<typename> typename I, size_t N>
 requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> template<class R, template<typename> typename S>
 requires AGPTracer::Entities::Shape<S, T> auto
-AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::raytrace(sycl::queue& queue, Entities::RandomGenerator_t<R>& random_generator, Entities::Scene_t<T, S>& scene) -> void {
+AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::raytrace(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene) -> void {
     const T tot_subpix                 = subpix_[0] * subpix_[1];
     const T pixel_span_y               = fov_[0] / static_cast<T>(image_.size_y_);
     const T pixel_span_x               = fov_[1] / static_cast<T>(image_.size_x_);
@@ -52,7 +51,6 @@ AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::raytrace(sycl::queue& queue, 
 
     // Copy of members
     const std::array<unsigned int, 2> subpix = subpix_;
-    std::uniform_real_distribution<T> unif   = unif_; // unif_ is not really needed then...
     const Entities::Vec3<T> direction        = direction_;
     const Entities::Vec3<T> origin           = origin_;
     Entities::MediumList_t<N> medium_list    = medium_list_;
@@ -69,22 +67,22 @@ AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::raytrace(sycl::queue& queue, 
         // Getting read write access to the buffer on a device
         auto image_accessor  = image_.getAccessor(cgh);
         auto scene_accessor  = scene.getAccessor(cgh);
-        auto random_accessor = random_generator.rng_vec_.template get_access<sycl::access::mode::read_write>(cgh);
+        auto random_accessor = random_generator.getAccessor(cgh);
 
         // Executing kernel
         cgh.parallel_for<class SphericalCameraRaytrace>(num_work_items, [=](sycl::id<2> WIid) {
-            Entities::Vec3<T> col                        = Entities::Vec3<T>();
-            const Entities::Vec3<T> pix_vec              = Entities::Vec3<T>(T{1},
+            Entities::Vec3<T> col                   = Entities::Vec3<T>();
+            const Entities::Vec3<T> pix_vec         = Entities::Vec3<T>(T{1},
                                                                 std::numbers::pi_v<T> / T{2} + (static_cast<T>(WIid[1]) - static_cast<double>(num_work_items[1]) / T{2} + T{0.5}) * pixel_span_y,
                                                                 (static_cast<double>(WIid[0]) - static_cast<double>(num_work_items[0]) / T{2} + T{0.5}) * pixel_span_x);
-            R& rng                                       = random_accessor[WIid];
-            std::uniform_real_distribution<T> unif_local = unif; // Not sure if this is needed, maybe put in Entities::RandomGenerator_t?
+            R& rng                                  = random_accessor.rng_[WIid];
+            std::uniform_real_distribution<T>& unif = random_accessor.unif_[WIid];
 
             for (unsigned int subindex = 0; subindex < subpix[0] * subpix[1]; ++subindex) {
                 const unsigned int l  = subindex % subpix[1]; // x
                 const unsigned int k  = subindex / subpix[1]; // y
-                const double jitter_y = unif_local(rng);
-                const double jitter_x = unif_local(rng);
+                const double jitter_y = unif(rng);
+                const double jitter_x = unif(rng);
 
                 const Entities::Vec3<T> subpix_vec = (pix_vec
                                                       + Entities::Vec3<T>(T{0},
@@ -93,7 +91,7 @@ AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::raytrace(sycl::queue& queue, 
                                                          .to_xyz_offset(direction, horizontal, vertical);
 
                 Entities::Ray_t ray(origin, subpix_vec, Entities::Vec3<T>(), Entities::Vec3<T>(T{1}), medium_list);
-                scene_accessor.raycast(rng, ray, max_bounces, skybox);
+                scene_accessor.raycast(rng, unif, ray, max_bounces, skybox);
                 col += ray.colour_;
             }
             col = col / tot_subpix;
@@ -105,29 +103,13 @@ AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::raytrace(sycl::queue& queue, 
 template<typename T, template<typename> typename K, template<typename> typename I, size_t N>
 requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> template<class R, template<typename> typename S>
 requires AGPTracer::Entities::Shape<S, T> auto
-AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulate(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene, unsigned int n_iter) -> void {
+AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulate(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene, unsigned int n_iter) -> void {
     unsigned int n = 0;
     while (n < n_iter) {
         ++n;
 
         auto t_start = std::chrono::high_resolution_clock::now();
-        raytrace(random_generator, scene);
-        auto t_end = std::chrono::high_resolution_clock::now();
-
-        std::cout << "Iteration " << n << " done in " << std::chrono::duration<T>(t_end - t_start).count() << "s." << std::endl;
-    }
-}
-
-template<typename T, template<typename> typename K, template<typename> typename I, size_t N>
-requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> template<class R, template<typename> typename S>
-requires AGPTracer::Entities::Shape<S, T> auto AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulate(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene)
-    -> void {
-    unsigned int n = 0;
-    while (true) {
-        ++n;
-
-        auto t_start = std::chrono::high_resolution_clock::now();
-        raytrace(random_generator, scene);
+        raytrace(queue, random_generator, scene);
         auto t_end = std::chrono::high_resolution_clock::now();
 
         std::cout << "Iteration " << n << " done in " << std::chrono::duration<T>(t_end - t_start).count() << "s." << std::endl;
@@ -137,15 +119,30 @@ requires AGPTracer::Entities::Shape<S, T> auto AGPTracer::Cameras::SphericalCame
 template<typename T, template<typename> typename K, template<typename> typename I, size_t N>
 requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> template<class R, template<typename> typename S>
 requires AGPTracer::Entities::Shape<S, T> auto
-AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulateWrite(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene, unsigned int n_iter, unsigned int interval)
-    -> void {
+AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulate(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene) -> void {
+    unsigned int n = 0;
+    while (true) {
+        ++n;
+
+        auto t_start = std::chrono::high_resolution_clock::now();
+        raytrace(queue, random_generator, scene);
+        auto t_end = std::chrono::high_resolution_clock::now();
+
+        std::cout << "Iteration " << n << " done in " << std::chrono::duration<T>(t_end - t_start).count() << "s." << std::endl;
+    }
+}
+
+template<typename T, template<typename> typename K, template<typename> typename I, size_t N>
+requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> template<class R, template<typename> typename S>
+requires AGPTracer::Entities::Shape<S, T> auto AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulateWrite(
+    sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene, unsigned int n_iter, unsigned int interval) -> void {
     // std::chrono::steady_clock::time_point t_start, t_end;
     unsigned int n = 0;
     while (n < n_iter) {
         ++n;
 
         auto t_start = std::chrono::high_resolution_clock::now();
-        raytrace(random_generator, scene);
+        raytrace(queue, random_generator, scene);
         auto t_end = std::chrono::high_resolution_clock::now();
 
         std::cout << "Iteration " << n << " done in " << std::chrono::duration<T>(t_end - t_start).count() << "s." << std::endl;
@@ -164,13 +161,14 @@ AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulateWrite(Entities::Ran
 template<typename T, template<typename> typename K, template<typename> typename I, size_t N>
 requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> template<class R, template<typename> typename S>
 requires AGPTracer::Entities::Shape<S, T> auto
-AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulateWrite(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene, unsigned int interval) -> void {
+AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulateWrite(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene, unsigned int interval)
+    -> void {
     unsigned int n = 0;
     while (true) {
         ++n;
 
         auto t_start = std::chrono::high_resolution_clock::now();
-        raytrace(random_generator, scene);
+        raytrace(queue, random_generator, scene);
         auto t_end = std::chrono::high_resolution_clock::now();
 
         std::cout << "Iteration " << n << " done in " << std::chrono::duration<T>(t_end - t_start).count() << "s." << std::endl;
@@ -188,14 +186,14 @@ AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulateWrite(Entities::Ran
 
 template<typename T, template<typename> typename K, template<typename> typename I, size_t N>
 requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> template<class R, template<typename> typename S>
-requires AGPTracer::Entities::Shape<S, T> auto AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulateWrite(Entities::RandomGenerator_t<R>& random_generator,
-                                                                                                                  const Entities::Scene_t<T, S>& scene) -> void {
+requires AGPTracer::Entities::Shape<S, T> auto
+AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulateWrite(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene) -> void {
     unsigned int n = 0;
     while (true) {
         ++n;
 
         auto t_start = std::chrono::high_resolution_clock::now();
-        raytrace(random_generator, scene);
+        raytrace(queue, random_generator, scene);
         auto t_end = std::chrono::high_resolution_clock::now();
 
         std::cout << "Iteration " << n << " done in " << std::chrono::duration<T>(t_end - t_start).count() << "s." << std::endl;

@@ -3,17 +3,16 @@
 #include <numbers>
 
 template<typename T>
-AGPTracer::Materials::Diffuse_t<T>::Diffuse_t(AGPTracer::Entities::Vec3<T> emission, AGPTracer::Entities::Vec3<T> colour, T roughness) :
-        emission_(emission), colour_(colour), roughness_(roughness), unif_(std::uniform_real_distribution<T>(0, 1)) {}
+AGPTracer::Materials::Diffuse_t<T>::Diffuse_t(AGPTracer::Entities::Vec3<T> emission, AGPTracer::Entities::Vec3<T> colour, T roughness) : emission_(emission), colour_(colour), roughness_(roughness) {}
 
 template<typename T>
 template<class R, template<typename> typename S, size_t N>
-requires AGPTracer::Entities::Shape<S, T> auto AGPTracer::Materials::Diffuse_t<T>::bounce(R& random_generator, std::array<T, 2> uv, const S<T>& hit_obj, AGPTracer::Entities::Ray_t<T, N>& ray)
-    -> void {
+requires AGPTracer::Entities::Shape<S, T> auto
+AGPTracer::Materials::Diffuse_t<T>::bounce(R& rng, std::uniform_real_distribution<T>& unif, std::array<T, 2> uv, const S<T>& hit_obj, AGPTracer::Entities::Ray_t<T, N>& ray) const -> void {
     AGPTracer::Entities::Vec3<T> normal = hit_obj.normal(ray.time_, uv);
 
-    const T rand1  = unif_(random_generator()) * T{2} * std::numbers::pi_v<T>;
-    const T rand2  = unif_(random_generator());
+    const T rand1  = unif(rng) * T{2} * std::numbers::pi_v<T>;
+    const T rand2  = unif(rng);
     const T rand2s = sqrt(rand2);
 
     if (normal.dot(ray.direction_) > T{0}) {

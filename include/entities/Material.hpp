@@ -20,8 +20,8 @@ namespace AGPTracer { namespace Entities {
      * @tparam T Floating point datatype to use
      */
     template<template<typename> typename M, typename T>
-    concept Material = requires(M<T> a, std::mt19937& random_generator, std::array<T, 2> uv, const Shapes::Triangle_t<T>& hit_obj, Ray_t<T, 16>& ray) {
-        { a.bounce(random_generator, uv, hit_obj, ray) } -> std::convertible_to<void>;
+    concept Material = requires(const M<T> a, std::mt19937& rng, std::uniform_real_distribution<T>& unif, std::array<T, 2> uv, const Shapes::Triangle_t<T>& hit_obj, Ray_t<T, 16>& ray) {
+        { a.bounce(rng, unif, uv, hit_obj, ray) } -> std::convertible_to<void>;
     };
 }}
 

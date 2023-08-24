@@ -106,12 +106,12 @@ auto main() -> int {
              {}
         };
         const AGPTracer::Entities::MeshGeometry_t<double> geom("assets/Zombie_Beast4.obj");
-        const AGPTracer::Skyboxes::SkyboxFlat_t<double> skybox_flat(Vec3<double>{1, 0, 1});
+        const AGPTracer::Skyboxes::SkyboxFlat_t<double> skybox_flat(Vec3<double>{0.75, 0.75, 0.75});
         auto triangles = get_triangles();
         auto materials = get_materials();
         auto mediums   = get_mediums();
         AGPTracer::Entities::Scene_t<double, Triangle_t, Diffuse_t, NonAbsorber_t> scene(triangles, materials, mediums);
-        AGPTracer::Entities::RandomGenerator_t<std::mt19937> random_generator(size_x, size_y);
+        AGPTracer::Entities::RandomGenerator_t<double, std::mt19937> random_generator(size_x, size_y);
         const AGPTracer::Materials::Diffuse_t<double> diffuse(Vec3<double>(0, 0, 0), Vec3<double>(0.5, 0.5, 0.5), 1);
         const AGPTracer::Mediums::NonAbsorber_t<double> non_absorber(1, 32);
         const AGPTracer::Entities::Texture_t<double> texture("assets/Zombie beast_texture5.png");
@@ -121,6 +121,8 @@ auto main() -> int {
         };
         AGPTracer::Cameras::SphericalCamera_t<double, AGPTracer::Skyboxes::SkyboxFlat_t, AGPTracer::Images::SimpleImage_t> spherical_camera(
             TransformMatrix_t{}, "images/default.png", Vec3<double>(0, 0, 1), std::array<double, 2>{0.93084, 1.3963}, std::array<unsigned int, 2>{1, 1}, medium_list, skybox_flat, 8, 1, simple_image);
+        spherical_camera.transformation_.translate(Vec3<double>(0, -2, 0));
+        spherical_camera.update();
 
         fill_triangles(triangle_buffer);
 
@@ -134,7 +136,7 @@ auto main() -> int {
 
         std::cout << "Selected " << queue.get_info<sycl::info::queue::device>().get_info<sycl::info::device::name>() << std::endl << std::endl;
 
-        spherical_camera.raytrace(queue, random_generator, scene);
+        spherical_camera.accumulate(queue, random_generator, scene, 100);
         spherical_camera.write("test.png");
 
         // Size of index space for kernel

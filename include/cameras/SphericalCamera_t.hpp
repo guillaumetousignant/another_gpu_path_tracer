@@ -79,7 +79,6 @@ namespace AGPTracer { namespace Cameras {
             Entities::Vec3<T> up_; /**< @brief Vector pointing up. Used to set the roll of the camera. Changed by setUp.*/
             Entities::Vec3<T> up_buffer_; /**< @brief Stores the up vector until the camera is updated.*/
             I<T> image_; /**< @brief Image buffer into which the image is stored.*/
-            std::uniform_real_distribution<T> unif_; /**< @brief Uniform random distribution used for generating random numbers.*/
 
             /**
              * @brief Updates the camera's members.
@@ -97,11 +96,12 @@ namespace AGPTracer { namespace Cameras {
              *
              * @tparam R Random generator type to use
              * @tparam S Shape type to use
+             * @param queue Device queue to use to run computations
              * @param random_generator Random generator used to get random numbers
              * @param scene Scene that will be used to find what each ray hits.
              */
             template<class R, template<typename> typename S>
-            requires Entities::Shape<S, T> auto raytrace(sycl::queue& queue, Entities::RandomGenerator_t<R>& random_generator, Entities::Scene_t<T, S>& scene) -> void;
+            requires Entities::Shape<S, T> auto raytrace(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene) -> void;
 
             /**
              * @brief Raytraces the scene multiple times to get more samples per pixel.
@@ -110,12 +110,13 @@ namespace AGPTracer { namespace Cameras {
              *
              * @tparam R Random generator type to use
              * @tparam S Shape type to use
+             * @param queue Device queue to use to run computations
              * @param random_generator Random generator used to get random numbers
              * @param scene Scene that will be used to find what each ray hits.
              * @param n_iter Number of times the scene will be raytraced.
              */
             template<class R, template<typename> typename S>
-            requires Entities::Shape<S, T> auto accumulate(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene, unsigned int n_iter) -> void;
+            requires Entities::Shape<S, T> auto accumulate(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene, unsigned int n_iter) -> void;
 
             /**
              * @brief Raytraces the scene indefinitely to get more samples per pixel.
@@ -124,11 +125,12 @@ namespace AGPTracer { namespace Cameras {
              *
              * @tparam R Random generator type to use
              * @tparam S Shape type to use
+             * @param queue Device queue to use to run computations
              * @param random_generator Random generator used to get random numbers
              * @param scene Scene that will be used to find what each ray hits.
              */
             template<class R, template<typename> typename S>
-            requires Entities::Shape<S, T> auto accumulate(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene) -> void;
+            requires Entities::Shape<S, T> auto accumulate(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene) -> void;
 
             /**
              * @brief Raytraces the scene multiple times to get more samples per pixel, saving the image every so often.
@@ -137,14 +139,15 @@ namespace AGPTracer { namespace Cameras {
              *
              * @tparam R Random generator type to use
              * @tparam S Shape type to use
+             * @param queue Device queue to use to run computations
              * @param random_generator Random generator used to get random numbers
              * @param scene Scene that will be used to find what each ray hits.
              * @param n_iter Number of times the scene will be raytraced.
              * @param interval Saves the image every x frames by calling write().
              */
             template<class R, template<typename> typename S>
-            requires Entities::Shape<S, T> auto accumulateWrite(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene, unsigned int n_iter, unsigned int interval)
-                -> void;
+            requires Entities::Shape<S, T> auto
+            accumulateWrite(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene, unsigned int n_iter, unsigned int interval) -> void;
 
             /**
              * @brief Raytraces the scene indefinitely to get more samples per pixel, saving the image every so often.
@@ -153,12 +156,13 @@ namespace AGPTracer { namespace Cameras {
              *
              * @tparam R Random generator type to use
              * @tparam S Shape type to use
+             * @param queue Device queue to use to run computations
              * @param random_generator Random generator used to get random numbers
              * @param scene Scene that will be used to find what each ray hits.
              * @param interval Saves the image every x frames by calling write().
              */
             template<class R, template<typename> typename S>
-            requires Entities::Shape<S, T> auto accumulateWrite(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene, unsigned int interval) -> void;
+            requires Entities::Shape<S, T> auto accumulateWrite(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene, unsigned int interval) -> void;
 
             /**
              * @brief Raytraces the scene indefinitely to get more samples per pixel, saving the image frame.
@@ -167,11 +171,12 @@ namespace AGPTracer { namespace Cameras {
              *
              * @tparam R Random generator type to use
              * @tparam S Shape type to use
+             * @param queue Device queue to use to run computations
              * @param random_generator Random generator used to get random numbers
              * @param scene Scene that will be used to find what each ray hits.
              */
             template<class R, template<typename> typename S>
-            requires Entities::Shape<S, T> auto accumulateWrite(Entities::RandomGenerator_t<R>& random_generator, const Entities::Scene_t<T, S>& scene) -> void;
+            requires Entities::Shape<S, T> auto accumulateWrite(sycl::queue& queue, Entities::RandomGenerator_t<T, R>& random_generator, Entities::Scene_t<T, S>& scene) -> void;
 
             /**
              * @brief Sets the focus distance of the camera to a specific distance.
@@ -191,11 +196,12 @@ namespace AGPTracer { namespace Cameras {
              * such. The focal plane's shape will vary based on the projection used.
              *
              * @tparam S Shape type to use
+             * @param queue Device queue to use to run computations
              * @param scene Scene that will be used to find what object the ray hits and its distance.
              * @param position Where in the frame will the ray be sent. [horizontal, vertical], both from 0 to 1, starting from bottom left.
              */
             template<template<typename> typename S>
-            requires Entities::Shape<S, T> auto autoFocus(const Entities::Scene_t<T, S>& scene, std::array<T, 2> position) -> void{};
+            requires Entities::Shape<S, T> auto autoFocus(sycl::queue& queue, Entities::Scene_t<T, S>& scene, std::array<T, 2> position) -> void{};
 
             /**
              * @brief Set the up vector of the camera.

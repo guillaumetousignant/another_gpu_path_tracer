@@ -20,8 +20,8 @@ namespace AGPTracer { namespace Entities {
      * @tparam T Floating point datatype
      */
     template<template<typename> typename C, typename T>
-    concept Raytrace = requires(C<T> a, RandomGenerator_t<std::mt19937>& random_generator, Scene_t<T, Shapes::Triangle_t<T>>& scene) {
-        { a.raytrace(random_generator, scene) } -> std::convertible_to<void>;
+    concept Raytrace = requires(C<T> a, sycl::queue& queue, RandomGenerator_t<T, std::mt19937>& rng, std::uniform_real_distribution<T>& unif, Scene_t<T, Shapes::Triangle_t<T>>& scene) {
+        { a.raytrace(queue, rng, unif, scene) } -> std::convertible_to<void>;
     };
 
     /**
@@ -31,20 +31,27 @@ namespace AGPTracer { namespace Entities {
      * @tparam T Floating point datatype
      */
     template<template<typename> typename C, typename T>
-    concept Accumulate = requires(C<T> a, RandomGenerator_t<std::mt19937>& random_generator, const Scene_t<T, Shapes::Triangle_t<T>>& scene, unsigned int n_iter) {
-        { a.accumulate(random_generator, scene, n_iter) } -> std::convertible_to<void>;
+    concept Accumulate =
+        requires(C<T> a, sycl::queue& queue, RandomGenerator_t<T, std::mt19937>& rng, std::uniform_real_distribution<T>& unif, const Scene_t<T, Shapes::Triangle_t<T>>& scene, unsigned int n_iter) {
+        { a.accumulate(queue, rng, unif, scene, n_iter) } -> std::convertible_to<void>;
     }
-    &&requires(C<T> a, RandomGenerator_t<std::mt19937>& random_generator, const Scene_t<T, Shapes::Triangle_t<T>>& scene) {
-        { a.accumulate(random_generator, scene) } -> std::convertible_to<void>;
+    &&requires(C<T> a, sycl::queue& queue, RandomGenerator_t<T, std::mt19937>& rng, std::uniform_real_distribution<T>& unif, const Scene_t<T, Shapes::Triangle_t<T>>& scene) {
+        { a.accumulate(queue, rng, unif, scene) } -> std::convertible_to<void>;
     }
-    &&requires(C<T> a, RandomGenerator_t<std::mt19937>& random_generator, const Scene_t<T, Shapes::Triangle_t<T>>& scene, unsigned int n_iter, unsigned int interval) {
-        { a.accumulateWrite(random_generator, scene, n_iter, interval) } -> std::convertible_to<void>;
+    &&requires(C<T> a,
+               sycl::queue& queue,
+               RandomGenerator_t<T, std::mt19937>& rng,
+               std::uniform_real_distribution<T>& unif,
+               const Scene_t<T, Shapes::Triangle_t<T>>& scene,
+               unsigned int n_iter,
+               unsigned int interval) {
+        { a.accumulateWrite(queue, rng, unif, scene, n_iter, interval) } -> std::convertible_to<void>;
     }
-    &&requires(C<T> a, RandomGenerator_t<std::mt19937>& random_generator, const Scene_t<T, Shapes::Triangle_t<T>>& scene, unsigned int interval) {
-        { a.accumulateWrite(random_generator, scene, interval) } -> std::convertible_to<void>;
+    &&requires(C<T> a, sycl::queue& queue, RandomGenerator_t<T, std::mt19937>& rng, std::uniform_real_distribution<T>& unif, const Scene_t<T, Shapes::Triangle_t<T>>& scene, unsigned int interval) {
+        { a.accumulateWrite(queue, rng, unif, scene, interval) } -> std::convertible_to<void>;
     }
-    &&requires(C<T> a, RandomGenerator_t<std::mt19937>& random_generator, const Scene_t<T, Shapes::Triangle_t<T>>& scene) {
-        { a.accumulateWrite(random_generator, scene) } -> std::convertible_to<void>;
+    &&requires(C<T> a, sycl::queue& queue, RandomGenerator_t<T, std::mt19937>& rng, std::uniform_real_distribution<T>& unif, const Scene_t<T, Shapes::Triangle_t<T>>& scene) {
+        { a.accumulateWrite(queue, rng, unif, scene) } -> std::convertible_to<void>;
     };
 
     /**
@@ -57,8 +64,8 @@ namespace AGPTracer { namespace Entities {
     concept Focus = requires(C<T> a, T focus_distance) {
         { a.focus(focus_distance) } -> std::convertible_to<void>;
     }
-    &&requires(C<T> a, const Scene_t<T, Shapes::Triangle_t<T>>& scene, std::array<T, 2> position) {
-        { a.autoFocus(scene, position) } -> std::convertible_to<void>;
+    &&requires(C<T> a, sycl::queue& queue, const Scene_t<T, Shapes::Triangle_t<T>>& scene, std::array<T, 2> position) {
+        { a.autoFocus(queue, scene, position) } -> std::convertible_to<void>;
     };
 
     /**

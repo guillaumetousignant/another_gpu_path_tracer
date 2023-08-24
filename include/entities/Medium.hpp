@@ -4,6 +4,7 @@
 #include "entities/Ray_t.hpp"
 #include "entities/Translucent.hpp"
 #include <concepts>
+#include <random>
 
 namespace AGPTracer { namespace Entities {
     /**
@@ -12,8 +13,8 @@ namespace AGPTracer { namespace Entities {
      * @tparam D Scattering type
      */
     template<template<typename> typename D, typename T>
-    concept Scattering = requires(D<T> a, Ray_t<T, 16>& ray) {
-        { a.scatter(ray) } -> std::convertible_to<bool>;
+    concept Scattering = requires(const D<T> a, std::mt19937& rng, std::uniform_real_distribution<T>& unif, Ray_t<T, 16>& ray) {
+        { a.scatter(rng, unif, ray) } -> std::convertible_to<bool>;
     };
 
     /**

@@ -36,7 +36,6 @@ namespace AGPTracer { namespace Materials {
             AGPTracer::Entities::Vec3<T> colour_; /**< @brief Colour reflected by the material at each bounce.*/
             T roughness_; /**< @brief Attenuation of the colour as the angle between the incident ray and the surface normal increase. 0 to 1, 0 being very rough (no attenuation) and 1 being an
                                   ideal diffusely reflective surface, obeying Lambert's cosine law.*/
-            std::uniform_real_distribution<T> unif_; /**< @brief Uniform random distribution used for generating random numbers.*/
 
             /**
              * @brief Bounces a ray of light on the material.
@@ -47,16 +46,17 @@ namespace AGPTracer { namespace Materials {
              * The ray's origin is set to the hit point, and its direction is randomly selected within the hemisphere
              * above the hit point to model diffuse reflection.
              *
-             * @tparam S Shape that was intersected
              * @tparam R Random generator type to use
+             * @tparam S Shape that was intersected
              * @tparam N Number of mediums in the ray's medium list
-             * @param random_generator Random generator used to get random numbers
+             * @param rng Random generator used to get random numbers
+             * @param unif Uniform distribution used to get random numbers
              * @param uv Object space coordinates of the hit point. Used to query the shape for values at coordinates on it. Two components, u, and v, that can change meaning depending on the shape.
              * @param hit_obj Pointer to the shape that was hit by the ray.
              * @param ray Ray that has intersected the shape.
              */
             template<class R, template<typename> typename S, size_t N>
-            requires Entities::Shape<S, T> auto bounce(R& random_generator, std::array<T, 2> uv, const S<T>& hit_obj, AGPTracer::Entities::Ray_t<T, N>& ray) -> void;
+            requires Entities::Shape<S, T> auto bounce(R& rng, std::uniform_real_distribution<T>& unif, std::array<T, 2> uv, const S<T>& hit_obj, AGPTracer::Entities::Ray_t<T, N>& ray) const -> void;
     };
 }}
 
