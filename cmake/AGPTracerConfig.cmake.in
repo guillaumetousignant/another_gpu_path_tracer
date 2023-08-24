@@ -7,10 +7,7 @@ include(CMakeFindDependencyMacro)
 @PNG_DEPENDENCY@
 @JPEG_DEPENDENCY@
 @TIFF_DEPENDENCY@
-list(INSERT CMAKE_FRAMEWORK_PATH 0 /System/Library/Frameworks) # Because CMake doesn't find the correct GLUT on macOS 
-@GLUT_DEPENDENCY@
-@OPENGL_DEPENDENCY@
-@OPENMP_DEPENDENCY@
+list(INSERT CMAKE_FRAMEWORK_PATH 0 /System/Library/Frameworks) # Because CMake doesn't find the correct GLUT on macOS
 
 if(NOT TARGET AGPTracer::AGPTracer)
     include("${AGPTRACER_CMAKE_DIR}/AGPTracerTargets.cmake")

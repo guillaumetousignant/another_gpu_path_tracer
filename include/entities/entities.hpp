@@ -11,11 +11,19 @@ namespace AGPTracer {
     }
 }
 
+#include "Camera.hpp"
+#include "Material.hpp"
+#include "Medium.hpp"
+#include "MediumList_t.hpp"
 #include "MeshGeometry_t.hpp"
 #include "RandomGenerator_t.hpp"
 #include "Ray_t.hpp"
 #include "Scene_t.hpp"
+#include "Shape.hpp"
+#include "Skybox.hpp"
+#include "Texture_t.hpp"
 #include "TransformMatrix_t.hpp"
+#include "Translucent.hpp"
 #include "Vec3.hpp"
 
 

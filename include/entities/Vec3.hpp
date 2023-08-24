@@ -3,9 +3,9 @@
 
 #include <algorithm>
 #include <array>
-#include <CL/sycl.hpp>
 #include <cmath>
 #include <iostream>
+#include <sycl/sycl.hpp>
 #include <utility>
 
 namespace AGPTracer { namespace Entities {
@@ -526,7 +526,7 @@ namespace AGPTracer { namespace Entities {
              *
              * @return Vec3 Vector made of the square root of all components of the vector.
              */
-            auto sqrt() const -> Vec3<decltype(cl::sycl::sqrt(std::declval<T>()))>; // In c++26 sqrt is constexpr
+            auto sqrt() const -> Vec3<decltype(sycl::sqrt(std::declval<T>()))>; // In c++26 sqrt is constexpr
 
             /**
              * @brief Returns a vector of the exponential of all components of the vector.

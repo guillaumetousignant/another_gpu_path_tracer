@@ -10,9 +10,13 @@
 namespace AGPTracer {
 }
 
+#include "cameras/cameras.hpp"
 #include "entities/entities.hpp"
+#include "images/images.hpp"
 #include "materials/materials.hpp"
+#include "mediums/mediums.hpp"
 #include "shapes/shapes.hpp"
 #include "skyboxes/skyboxes.hpp"
+
 
 #endif

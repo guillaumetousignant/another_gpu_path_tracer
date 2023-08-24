@@ -3,7 +3,7 @@
 
 #include "entities/Vec3.hpp"
 #include <array>
-#include <CL/sycl.hpp>
+#include <sycl/sycl.hpp>
 
 namespace AGPTracer { namespace Entities {
 

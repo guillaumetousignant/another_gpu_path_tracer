@@ -4,10 +4,12 @@
 #include <limits>
 
 template<typename T>
-AGPTracer::Shapes::Triangle_t<T>::Triangle_t(/*AGPTracer::Entities::Material_t *material,*/ std::array<AGPTracer::Entities::Vec3<T>, 3> points, // In c++26 sqrt is constexpr
+AGPTracer::Shapes::Triangle_t<T>::Triangle_t(size_t material,
+                                             Entities::TransformMatrix_t<T> transform_matrix,
+                                             std::array<AGPTracer::Entities::Vec3<T>, 3> points, // In c++26 sqrt is constexpr
                                              const std::optional<std::array<AGPTracer::Entities::Vec3<T>, 3>> normals,
                                              const std::optional<std::array<T, 6>> texcoord) :
-        points_orig_{points} {
+        material_(material), transformation_(std::move(transform_matrix)), points_orig_{points} {
 
     const AGPTracer::Entities::Vec3<T> nor = (points_orig_[1] - points_orig_[0]).cross(points_orig_[2] - points_orig_[0]).normalize_inplace();
     normals_orig_                          = normals.value_or(std::array<AGPTracer::Entities::Vec3<T>, 3>{nor, nor, nor});
@@ -46,7 +48,8 @@ auto AGPTracer::Shapes::Triangle_t<T>::update() -> void { // In c++26 sqrt is co
 }
 
 template<typename T>
-constexpr auto AGPTracer::Shapes::Triangle_t<T>::intersection(const AGPTracer::Entities::Ray_t<T>& ray, T& t, std::array<T, 2>& uv) const -> bool {
+template<size_t N>
+constexpr auto AGPTracer::Shapes::Triangle_t<T>::intersection(const AGPTracer::Entities::Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> bool {
     const AGPTracer::Entities::Vec3<T> pvec = ray.direction_.cross(v0v2_);
     const T det                             = v0v1_.dot(pvec);
 
@@ -82,7 +85,17 @@ constexpr auto AGPTracer::Shapes::Triangle_t<T>::intersection(const AGPTracer::E
 
 template<typename T>
 template<class T2>
-constexpr auto AGPTracer::Shapes::Triangle_t<T>::normaluv(T2 time, std::array<T, 2> uv, std::array<T, 2>& tuv) const -> AGPTracer::Entities::Vec3<T> {
+constexpr auto AGPTracer::Shapes::Triangle_t<T>::normal(T2 time, std::array<T, 2> uv) const -> AGPTracer::Entities::Vec3<T> {
+    const AGPTracer::Entities::Vec3<T> distance = AGPTracer::Entities::Vec3<T>(1.0 - uv[0] - uv[1], uv[0], uv[1]);
+    return {distance[0] * normals_[0][0] + distance[1] * normals_[1][0] + distance[2] * normals_[2][0],
+            distance[0] * normals_[0][1] + distance[1] * normals_[1][1] + distance[2] * normals_[2][1],
+            distance[0] * normals_[0][2] + distance[1] * normals_[1][2] + distance[2] * normals_[2][2]};
+    // Matrix multiplication, optimise.
+}
+
+template<typename T>
+template<class T2>
+constexpr auto AGPTracer::Shapes::Triangle_t<T>::normal_uv(T2 time, std::array<T, 2> uv, std::array<T, 2>& tuv) const -> AGPTracer::Entities::Vec3<T> {
     const AGPTracer::Entities::Vec3<T> distance = AGPTracer::Entities::Vec3<T>(1.0 - uv[0] - uv[1], uv[0], uv[1]);
     // Matrix multiplication, optimise.
     tuv = {distance[0] * texture_coordinates_[0] + distance[1] * texture_coordinates_[2] + distance[2] * texture_coordinates_[4],
@@ -90,16 +103,6 @@ constexpr auto AGPTracer::Shapes::Triangle_t<T>::normaluv(T2 time, std::array<T,
     return {distance[0] * normals_[0][0] + distance[1] * normals_[1][0] + distance[2] * normals_[2][0],
             distance[0] * normals_[0][1] + distance[1] * normals_[1][1] + distance[2] * normals_[2][1],
             distance[0] * normals_[0][2] + distance[1] * normals_[1][2] + distance[2] * normals_[2][2]};
-}
-
-template<typename T>
-template<class T2>
-constexpr auto AGPTracer::Shapes::Triangle_t<T>::normal(T2 time, std::array<T, 2> uv) const -> AGPTracer::Entities::Vec3<T> {
-    const AGPTracer::Entities::Vec3<T> distance = AGPTracer::Entities::Vec3<T>(1.0 - uv[0] - uv[1], uv[0], uv[1]);
-    return {distance[0] * normals_[0][0] + distance[1] * normals_[1][0] + distance[2] * normals_[2][0],
-            distance[0] * normals_[0][1] + distance[1] * normals_[1][1] + distance[2] * normals_[2][1],
-            distance[0] * normals_[0][2] + distance[1] * normals_[1][2] + distance[2] * normals_[2][2]};
-    // Matrix multiplication, optimise.
 }
 
 template<typename T>

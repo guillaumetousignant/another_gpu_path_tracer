@@ -218,7 +218,7 @@ constexpr auto AGPTracer::Entities::Vec3<T>::getMax(T2 other) const -> Vec3<decl
 
 template<typename T>
 auto AGPTracer::Entities::Vec3<T>::magnitude() const -> T { // In c++26 sqrt is constexpr
-    return cl::sycl::sqrt(v_[0] * v_[0] + v_[1] * v_[1] + v_[2] * v_[2]);
+    return sycl::sqrt(v_[0] * v_[0] + v_[1] * v_[1] + v_[2] * v_[2]);
 }
 
 template<typename T>
@@ -307,8 +307,8 @@ constexpr auto AGPTracer::Entities::Vec3<T>::ln() const -> Vec3<decltype(std::lo
 }
 
 template<typename T>
-auto AGPTracer::Entities::Vec3<T>::sqrt() const -> Vec3<decltype(cl::sycl::sqrt(std::declval<T>()))> { // In c++26 sqrt is constexpr
-    return {cl::sycl::sqrt(v_[0]), cl::sycl::sqrt(v_[1]), cl::sycl::sqrt(v_[2])};
+auto AGPTracer::Entities::Vec3<T>::sqrt() const -> Vec3<decltype(sycl::sqrt(std::declval<T>()))> { // In c++26 sqrt is constexpr
+    return {sycl::sqrt(v_[0]), sycl::sqrt(v_[1]), sycl::sqrt(v_[2])};
 }
 
 template<typename T>

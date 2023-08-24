@@ -20,7 +20,7 @@ constexpr AGPTracer::Entities::TransformMatrix_t<T>::TransformMatrix_t(std::arra
 template<typename T>
 template<class T2>
 constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateXAxis(T2 angle) -> TransformMatrix_t<T>& {
-    const std::array<T, 16> other{1, 0, 0, 0, 0, cl::sycl::cos(angle), cl::sycl::sin(angle), 0, 0, -cl::sycl::sin(angle), cl::sycl::cos(angle), 0, 0, 0, 0, 1};
+    const std::array<T, 16> other{1, 0, 0, 0, 0, sycl::cos(angle), sycl::sin(angle), 0, 0, -sycl::sin(angle), sycl::cos(angle), 0, 0, 0, 0, 1};
     const std::array<T, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -36,8 +36,7 @@ constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateXAxis(T2 angle) 
 template<typename T>
 template<class T2>
 constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateYAxis(T2 angle) -> TransformMatrix_t<T>& {
-    const std::array<decltype(cl::sycl::cos(std::declval<T2>())), 16> other{
-        cl::sycl::cos(angle), 0, -cl::sycl::sin(angle), 0, 0, 1, 0, 0, cl::sycl::sin(angle), 0, cl::sycl::cos(angle), 0, 0, 0, 0, 1};
+    const std::array<decltype(sycl::cos(std::declval<T2>())), 16> other{sycl::cos(angle), 0, -sycl::sin(angle), 0, 0, 1, 0, 0, sycl::sin(angle), 0, sycl::cos(angle), 0, 0, 0, 0, 1};
     const std::array<T, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -53,8 +52,7 @@ constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateYAxis(T2 angle) 
 template<typename T>
 template<class T2>
 constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateZAxis(T2 angle) -> TransformMatrix_t<T>& {
-    const std::array<decltype(cl::sycl::cos(std::declval<T2>())), 16> other{
-        cl::sycl::cos(angle), cl::sycl::sin(angle), 0, 0, -cl::sycl::sin(angle), cl::sycl::cos(angle), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    const std::array<decltype(sycl::cos(std::declval<T2>())), 16> other{sycl::cos(angle), sycl::sin(angle), 0, 0, -sycl::sin(angle), sycl::cos(angle), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
     const std::array<T, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -70,22 +68,22 @@ constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateZAxis(T2 angle) 
 template<typename T>
 template<class T2>
 constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateX(T2 angle) -> TransformMatrix_t<T>& {
-    const std::array<decltype(cl::sycl::cos(std::declval<T2>())), 16> other{1,
-                                                                            0,
-                                                                            0,
-                                                                            0, /* Dunno if those work, pre-multiplied them*/
-                                                                            0,
-                                                                            cl::sycl::cos(angle),
-                                                                            cl::sycl::sin(angle),
-                                                                            0,
-                                                                            0,
-                                                                            -cl::sycl::sin(angle),
-                                                                            cl::sycl::cos(angle),
-                                                                            0,
-                                                                            0,
-                                                                            matrix_[13] - matrix_[13] * cl::sycl::cos(angle) + matrix_[14] * cl::sycl::sin(angle),
-                                                                            matrix_[14] - matrix_[14] * cl::sycl::cos(angle) - matrix_[13] * cl::sycl::sin(angle),
-                                                                            1};
+    const std::array<decltype(sycl::cos(std::declval<T2>())), 16> other{1,
+                                                                        0,
+                                                                        0,
+                                                                        0, /* Dunno if those work, pre-multiplied them*/
+                                                                        0,
+                                                                        sycl::cos(angle),
+                                                                        sycl::sin(angle),
+                                                                        0,
+                                                                        0,
+                                                                        -sycl::sin(angle),
+                                                                        sycl::cos(angle),
+                                                                        0,
+                                                                        0,
+                                                                        matrix_[13] - matrix_[13] * sycl::cos(angle) + matrix_[14] * sycl::sin(angle),
+                                                                        matrix_[14] - matrix_[14] * sycl::cos(angle) - matrix_[13] * sycl::sin(angle),
+                                                                        1};
     const std::array<T, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -101,22 +99,22 @@ constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateX(T2 angle) -> T
 template<typename T>
 template<class T2>
 constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateY(T2 angle) -> TransformMatrix_t<T>& {
-    const std::array<decltype(cl::sycl::cos(std::declval<T2>())), 16> other{cl::sycl::cos(angle),
-                                                                            0,
-                                                                            -cl::sycl::sin(angle),
-                                                                            0,
-                                                                            0,
-                                                                            1,
-                                                                            0,
-                                                                            0,
-                                                                            cl::sycl::sin(angle),
-                                                                            0,
-                                                                            cl::sycl::cos(angle),
-                                                                            0,
-                                                                            matrix_[12] - matrix_[12] * cl::sycl::cos(angle) - matrix_[14] * cl::sycl::sin(angle),
-                                                                            0,
-                                                                            matrix_[14] - matrix_[14] * cl::sycl::cos(angle) + matrix_[12] * cl::sycl::sin(angle),
-                                                                            1};
+    const std::array<decltype(sycl::cos(std::declval<T2>())), 16> other{sycl::cos(angle),
+                                                                        0,
+                                                                        -sycl::sin(angle),
+                                                                        0,
+                                                                        0,
+                                                                        1,
+                                                                        0,
+                                                                        0,
+                                                                        sycl::sin(angle),
+                                                                        0,
+                                                                        sycl::cos(angle),
+                                                                        0,
+                                                                        matrix_[12] - matrix_[12] * sycl::cos(angle) - matrix_[14] * sycl::sin(angle),
+                                                                        0,
+                                                                        matrix_[14] - matrix_[14] * sycl::cos(angle) + matrix_[12] * sycl::sin(angle),
+                                                                        1};
     const std::array<T, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -132,22 +130,22 @@ constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateY(T2 angle) -> T
 template<typename T>
 template<class T2>
 constexpr auto AGPTracer::Entities::TransformMatrix_t<T>::rotateZ(T2 angle) -> TransformMatrix_t<T>& {
-    const std::array<decltype(cl::sycl::cos(std::declval<T2>())), 16> other{cl::sycl::cos(angle),
-                                                                            cl::sycl::sin(angle),
-                                                                            0,
-                                                                            0,
-                                                                            -cl::sycl::sin(angle),
-                                                                            cl::sycl::cos(angle),
-                                                                            0,
-                                                                            0,
-                                                                            0,
-                                                                            0,
-                                                                            1,
-                                                                            0,
-                                                                            matrix_[12] - matrix_[12] * cl::sycl::cos(angle) + matrix_[13] * cl::sycl::sin(angle),
-                                                                            matrix_[13] - matrix_[13] * cl::sycl::cos(angle) - matrix_[12] * cl::sycl::sin(angle),
-                                                                            0,
-                                                                            1};
+    const std::array<decltype(sycl::cos(std::declval<T2>())), 16> other{sycl::cos(angle),
+                                                                        sycl::sin(angle),
+                                                                        0,
+                                                                        0,
+                                                                        -sycl::sin(angle),
+                                                                        sycl::cos(angle),
+                                                                        0,
+                                                                        0,
+                                                                        0,
+                                                                        0,
+                                                                        1,
+                                                                        0,
+                                                                        matrix_[12] - matrix_[12] * sycl::cos(angle) + matrix_[13] * sycl::sin(angle),
+                                                                        matrix_[13] - matrix_[13] * sycl::cos(angle) - matrix_[12] * sycl::sin(angle),
+                                                                        0,
+                                                                        1};
     const std::array<T, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -164,22 +162,22 @@ template<typename T>
 template<class T2, class T3>
 auto AGPTracer::Entities::TransformMatrix_t<T>::rotateAxis(const AGPTracer::Entities::Vec3<T3>& vec, T2 angle) -> TransformMatrix_t<T>& { // In c++26 sqrt is constexpr
     const AGPTracer::Entities::Vec3<T3> vec2 = vec.normalize(); // Dunno if needed
-    const std::array<decltype(std::declval<T3>() * cl::sycl::cos(std::declval<T2>())), 16> other{vec2[0] * vec2[0] * (1 - cl::sycl::cos(angle)) + cl::sycl::cos(angle),
-                                                                                                 vec2[1] * vec2[0] * (1 - cl::sycl::cos(angle)) - vec2[2] * cl::sycl::sin(angle),
-                                                                                                 vec2[2] * vec2[0] * (1 - cl::sycl::cos(angle)) + vec2[1] * cl::sycl::sin(angle),
-                                                                                                 0,
-                                                                                                 vec2[0] * vec2[1] * (1 - cl::sycl::cos(angle)) + vec2[2] * cl::sycl::sin(angle),
-                                                                                                 vec2[1] * vec2[1] * (1 - cl::sycl::cos(angle)) + cl::sycl::cos(angle),
-                                                                                                 vec2[2] * vec2[1] * (1 - cl::sycl::cos(angle)) - vec2[0] * cl::sycl::sin(angle),
-                                                                                                 0,
-                                                                                                 vec2[0] * vec2[2] * (1 - cl::sycl::cos(angle)) - vec2[0] * cl::sycl::sin(angle),
-                                                                                                 vec2[0] * vec2[1] * (1 - cl::sycl::cos(angle)) + vec2[0] * cl::sycl::sin(angle),
-                                                                                                 vec2[2] * vec2[2] * (1 - cl::sycl::cos(angle)) + cl::sycl::cos(angle),
-                                                                                                 0,
-                                                                                                 0,
-                                                                                                 0,
-                                                                                                 0,
-                                                                                                 1};
+    const std::array<decltype(std::declval<T3>() * sycl::cos(std::declval<T2>())), 16> other{vec2[0] * vec2[0] * (1 - sycl::cos(angle)) + sycl::cos(angle),
+                                                                                             vec2[1] * vec2[0] * (1 - sycl::cos(angle)) - vec2[2] * sycl::sin(angle),
+                                                                                             vec2[2] * vec2[0] * (1 - sycl::cos(angle)) + vec2[1] * sycl::sin(angle),
+                                                                                             0,
+                                                                                             vec2[0] * vec2[1] * (1 - sycl::cos(angle)) + vec2[2] * sycl::sin(angle),
+                                                                                             vec2[1] * vec2[1] * (1 - sycl::cos(angle)) + sycl::cos(angle),
+                                                                                             vec2[2] * vec2[1] * (1 - sycl::cos(angle)) - vec2[0] * sycl::sin(angle),
+                                                                                             0,
+                                                                                             vec2[0] * vec2[2] * (1 - sycl::cos(angle)) - vec2[0] * sycl::sin(angle),
+                                                                                             vec2[0] * vec2[1] * (1 - sycl::cos(angle)) + vec2[0] * sycl::sin(angle),
+                                                                                             vec2[2] * vec2[2] * (1 - sycl::cos(angle)) + sycl::cos(angle),
+                                                                                             0,
+                                                                                             0,
+                                                                                             0,
+                                                                                             0,
+                                                                                             1};
     const std::array<T, 16> matrix{matrix_};
 
     for (unsigned int j = 0; j < 4; j++) {
@@ -196,25 +194,25 @@ template<typename T>
 template<class T2, class T3>
 auto AGPTracer::Entities::TransformMatrix_t<T>::rotate(const AGPTracer::Entities::Vec3<T3>& vec, T2 angle) -> TransformMatrix_t<T>& { // In c++26 sqrt is constexpr
     const AGPTracer::Entities::Vec3<T3> vec2 = vec.normalize(); // Dunno if needed
-    const std::array<decltype(std::declval<T3>() * cl::sycl::cos(std::declval<T2>())), 16> other{
-        vec2[0] * vec2[0] * (1 - cl::sycl::cos(angle)) + cl::sycl::cos(angle),
-        vec2[1] * vec2[0] * (1 - cl::sycl::cos(angle)) - vec2[2] * cl::sycl::sin(angle),
-        vec2[2] * vec2[0] * (1 - cl::sycl::cos(angle)) + vec2[1] * cl::sycl::sin(angle),
+    const std::array<decltype(std::declval<T3>() * sycl::cos(std::declval<T2>())), 16> other{
+        vec2[0] * vec2[0] * (1 - sycl::cos(angle)) + sycl::cos(angle),
+        vec2[1] * vec2[0] * (1 - sycl::cos(angle)) - vec2[2] * sycl::sin(angle),
+        vec2[2] * vec2[0] * (1 - sycl::cos(angle)) + vec2[1] * sycl::sin(angle),
         0,
-        vec2[0] * vec2[1] * (1 - cl::sycl::cos(angle)) + vec2[2] * cl::sycl::sin(angle),
-        vec2[1] * vec2[1] * (1 - cl::sycl::cos(angle)) + cl::sycl::cos(angle),
-        vec2[2] * vec2[1] * (1 - cl::sycl::cos(angle)) - vec2[0] * cl::sycl::sin(angle),
+        vec2[0] * vec2[1] * (1 - sycl::cos(angle)) + vec2[2] * sycl::sin(angle),
+        vec2[1] * vec2[1] * (1 - sycl::cos(angle)) + sycl::cos(angle),
+        vec2[2] * vec2[1] * (1 - sycl::cos(angle)) - vec2[0] * sycl::sin(angle),
         0,
-        vec2[0] * vec2[2] * (1 - cl::sycl::cos(angle)) - vec2[0] * cl::sycl::sin(angle),
-        vec2[0] * vec2[1] * (1 - cl::sycl::cos(angle)) + vec2[0] * cl::sycl::sin(angle),
-        vec2[2] * vec2[2] * (1 - cl::sycl::cos(angle)) + cl::sycl::cos(angle),
+        vec2[0] * vec2[2] * (1 - sycl::cos(angle)) - vec2[0] * sycl::sin(angle),
+        vec2[0] * vec2[1] * (1 - sycl::cos(angle)) + vec2[0] * sycl::sin(angle),
+        vec2[2] * vec2[2] * (1 - sycl::cos(angle)) + sycl::cos(angle),
         0,
-        matrix_[12] + matrix_[14] * (vec2[0] * cl::sycl::sin(angle) + vec2[0] * vec2[2] * (cl::sycl::cos(angle) - 1))
-            - matrix_[13] * (vec2[2] * cl::sycl::sin(angle) - vec2[0] * vec2[1] * (cl::sycl::cos(angle) - 1)) - matrix_[12] * ((1 - cl::sycl::cos(angle)) * vec2[0] * vec2[0] + cl::sycl::cos(angle)),
-        matrix_[13] + matrix_[12] * (vec2[2] * cl::sycl::sin(angle) + vec2[0] * vec2[1] * (cl::sycl::cos(angle) - 1))
-            - matrix_[14] * (vec2[0] * cl::sycl::sin(angle) - vec2[0] * vec2[1] * (cl::sycl::cos(angle) - 1)) - matrix_[13] * ((1 - cl::sycl::cos(angle)) * vec2[1] * vec2[1] + cl::sycl::cos(angle)),
-        matrix_[14] - matrix_[12] * (vec2[1] * cl::sycl::sin(angle) - vec2[0] * vec2[2] * (cl::sycl::cos(angle) - 1))
-            + matrix_[13] * (vec2[0] * cl::sycl::sin(angle) + vec2[1] * vec2[2] * (cl::sycl::cos(angle) - 1)) - matrix_[14] * ((1 - cl::sycl::cos(angle)) * vec2[2] * vec2[2] + cl::sycl::cos(angle)),
+        matrix_[12] + matrix_[14] * (vec2[0] * sycl::sin(angle) + vec2[0] * vec2[2] * (sycl::cos(angle) - 1)) - matrix_[13] * (vec2[2] * sycl::sin(angle) - vec2[0] * vec2[1] * (sycl::cos(angle) - 1))
+            - matrix_[12] * ((1 - sycl::cos(angle)) * vec2[0] * vec2[0] + sycl::cos(angle)),
+        matrix_[13] + matrix_[12] * (vec2[2] * sycl::sin(angle) + vec2[0] * vec2[1] * (sycl::cos(angle) - 1)) - matrix_[14] * (vec2[0] * sycl::sin(angle) - vec2[0] * vec2[1] * (sycl::cos(angle) - 1))
+            - matrix_[13] * ((1 - sycl::cos(angle)) * vec2[1] * vec2[1] + sycl::cos(angle)),
+        matrix_[14] - matrix_[12] * (vec2[1] * sycl::sin(angle) - vec2[0] * vec2[2] * (sycl::cos(angle) - 1)) + matrix_[13] * (vec2[0] * sycl::sin(angle) + vec2[1] * vec2[2] * (sycl::cos(angle) - 1))
+            - matrix_[14] * ((1 - sycl::cos(angle)) * vec2[2] * vec2[2] + sycl::cos(angle)),
         1};
     // Wow just wow, such a line to write. I assume this is super slow
     const std::array<T, 16> matrix{matrix_};

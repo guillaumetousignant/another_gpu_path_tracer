@@ -2,6 +2,7 @@
 #define AGPTRACER_MATERIALS_DIFFUSE_T_HPP
 
 #include "entities/Ray_t.hpp"
+#include "entities/Shape.hpp"
 #include "entities/Vec3.hpp"
 #include <random>
 
@@ -46,12 +47,16 @@ namespace AGPTracer { namespace Materials {
              * The ray's origin is set to the hit point, and its direction is randomly selected within the hemisphere
              * above the hit point to model diffuse reflection.
              *
+             * @tparam S Shape that was intersected
+             * @tparam R Random generator type to use
+             * @tparam N Number of mediums in the ray's medium list
+             * @param random_generator Random generator used to get random numbers
              * @param uv Object space coordinates of the hit point. Used to query the shape for values at coordinates on it. Two components, u, and v, that can change meaning depending on the shape.
              * @param hit_obj Pointer to the shape that was hit by the ray.
              * @param ray Ray that has intersected the shape.
              */
-            template<class S>
-            auto bounce(std::array<T, 2> uv, const S& hit_obj, AGPTracer::Entities::Ray_t<T>& ray) -> void;
+            template<class R, template<typename> typename S, size_t N>
+            requires Entities::Shape<S, T> auto bounce(R& random_generator, std::array<T, 2> uv, const S<T>& hit_obj, AGPTracer::Entities::Ray_t<T, N>& ray) -> void;
     };
 }}
 

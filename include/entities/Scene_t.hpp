@@ -2,14 +2,19 @@
 #define AGPTRACER_ENTITIES_SCENE_T_HPP
 
 // #include "entities/AccelerationStructure_t.hpp"
+#include "entities/Material.hpp"
+#include "entities/Medium.hpp"
 #include "entities/Ray_t.hpp"
+#include "entities/Shape.hpp"
+#include "entities/Skybox.hpp"
+#include "materials/Diffuse_t.hpp"
+#include "mediums/NonAbsorber_t.hpp"
 #include "shapes/Triangle_t.hpp"
 #include <array>
-#include <CL/sycl.hpp>
 #include <memory>
 #include <optional>
 #include <span>
-#include <vector>
+#include <sycl/sycl.hpp>
 
 namespace AGPTracer { namespace Entities {
 
@@ -24,27 +29,86 @@ namespace AGPTracer { namespace Entities {
      * @tparam T Floating point datatype to use
      * @tparam S Shape making up the scene
      */
-    template<typename T = double, typename S = AGPTracer::Shapes::Triangle_t<T>>
-    class Scene_t {
+    template<typename T = double, template<typename> typename S = Shapes::Triangle_t, template<typename> typename M = Materials::Diffuse_t, template<typename> typename D = Mediums::NonAbsorber_t>
+    requires Entities::Shape<S, T>&& Entities::Material<M, T>&& Entities::Medium<D, T> class Scene_t {
         public:
+            class Accessor_t {
+                public:
+                    /**
+                     * @brief Construct a new Accessor_t object with the given buffers.
+                     *
+                     * @param cgh Device handler.
+                     * @param shapes Shape buffer to access.
+                     * @param materials Shape buffer to access.
+                     * @param mediums Shape buffer to access.
+                     */
+                    Accessor_t(sycl::handler& cgh, sycl::buffer<S<T>, 1>& shapes, sycl::buffer<M<T>, 1>& materials, sycl::buffer<D<T>, 1>& mediums);
+
+                    /**
+                     * @brief Intersects the ray with objects in the scene and bounces it on their material.
+                     *
+                     * This is the main function to compute the colour of a ray. A ray is sent through the scene,
+                     * finding the closest object hit. Then, the ray is modified by this object's material.
+                     * This change can change ray direction, origin, colour and mask. This process is repeated
+                     * up to max_bounces times, or until no object is it, at which point the skybox is intersected.
+                     * The ray is also modified by its first medium using the scatter function. If it is scattered,
+                     * it won't be bounced on the hit object's material, as it intersects the medium instead of
+                     * the object.
+                     *
+                     * @tparam R Random generator type
+                     * @tparam K Skybox type to intersect
+                     * @tparam N Number of mediums in the ray's medium list
+                     * @param[in] random_generator Random generator used to get random numbers.
+                     * @param[in] ray Ray to intersect with the scene.
+                     * @param[in] max_bounces Upper bound of number of bounces. Number of bounces may be less if no object is hit or ray can't be illuminated anymore.
+                     * @param[in] skybox Skybox that will be intersected if no object is hit.
+                     */
+                    template<class R, template<typename> typename K, size_t N>
+                    requires Entities::Skybox<K, T> auto raycast(R& random_generator, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void;
+
+                    /**
+                     * @brief Intersects the scene shapes directly one by one. Not to be used for general operation.
+                     *
+                     * @tparam N Number of mediums in the ray's medium list
+                     * @param[in] ray Ray to be intersected with the scene, using its current origin and direction.
+                     * @param[out] t Distance to intersection. It is stored in t if there is an intersection.
+                     * @param[out] uv 2D object-space coordinates of the intersection.
+                     * @return std::optional<std::reference_wrapper<S<T>>> Reference to the intersected shape. Returns none if there is no intersection.
+                     */
+                    template<size_t N>
+                    auto intersect_brute(const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<std::reference_wrapper<S<T>>>;
+
+                    /**
+                     * @brief Intersects the scene using the acceleration structure. Main way to intersect shapes.
+                     *
+                     * @tparam N Number of mediums in the ray's medium list
+                     * @param[in] ray Ray to be intersected with the scene, using its current origin and direction.
+                     * @param[out] t Distance to intersection. It is stored in t if there is an intersection.
+                     * @param[out] uv 2D object-space coordinates of the intersection.
+                     * @return std::optional<std::reference_wrapper<S<T>>> Reference to the intersected shape. Returns none if there is no intersection.
+                     */
+                    // template<size_t N>
+                    // auto intersect(const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<std::reference_wrapper<S<T>>>;
+
+                private:
+                    sycl::accessor<S<T>, 1, sycl::access::mode::read> shapes_; /**< @brief Accessor to the shapes.*/
+                    sycl::accessor<M<T>, 1, sycl::access::mode::read> materials_; /**< @brief Accessor to the materials.*/
+                    sycl::accessor<D<T>, 1, sycl::access::mode::read> mediums_; /**< @brief Accessor to the mediums.*/
+            };
+
             /**
              * @brief Construct a new empty Scene_t object.
              */
             Scene_t() = default;
 
             /**
-             * @brief Construct a new Scene_t object containing a single shape.
-             *
-             * @param shape Shape to add to the scene.
-             */
-            explicit Scene_t(S shape);
-
-            /**
-             * @brief Construct a new Scene_t object from multiple shapes.
+             * @brief Construct a new Scene_t object from shapes, materials and mediums.
              *
              * @param shapes Shapes to be added to the scene.
+             * @param materials Materials to be added to the scene.
+             * @param mediums Mediums to be added to the scene.
              */
-            explicit Scene_t(std::span<S> shapes);
+            Scene_t(std::span<S<T>> shapes, std::span<M<T>> materials, std::span<D<T>> mediums);
 
             /**
              * @brief Construct a new Scene_t object containing a single mesh.
@@ -60,42 +124,9 @@ namespace AGPTracer { namespace Entities {
              */
             // explicit Scene_t(const std::vector<Shapes::MeshTop_t*>& meshes);
 
-            /**
-             * @brief Destroy the Scene_t object.
-             */
-            ~Scene_t() = default;
-
-            /**
-             * @brief Copy construct a new Scene_t object.
-             *
-             * @param other Object to copy.
-             */
-            Scene_t(const Scene_t& other);
-
-            /**
-             * @brief Move construct a new Scene_t object.
-             *
-             * @param other Object to move.
-             */
-            Scene_t(Scene_t&& other) noexcept = default;
-
-            /**
-             * @brief Copy assignment.
-             *
-             * @param other Object to copy.
-             * @return Scene_t& Reference to this object.
-             */
-            auto operator=(const Scene_t& other) -> Scene_t&;
-
-            /**
-             * @brief Move assignment.
-             *
-             * @param other Object to move.
-             * @return Scene_t& Reference to this object.
-             */
-            auto operator=(Scene_t&& other) noexcept -> Scene_t& = default;
-
-            cl::sycl::buffer<S, 1> geometry_; /**< @brief Vector of shapes to be drawn.*/
+            sycl::buffer<S<T>, 1> shapes_; /**< @brief Vector of shapes to be drawn.*/
+            sycl::buffer<M<T>, 1> materials_; /**< @brief Vector of materials for the shapes.*/
+            sycl::buffer<D<T>, 1> mediums_; /**< @brief Vector of mediums for the materials.*/
             // std::unique_ptr<AccelerationStructure_t> acc_; /**< @brief Acceleration structure containing the shapes, used to accelerate intersection.*/
 
             /**
@@ -103,14 +134,42 @@ namespace AGPTracer { namespace Entities {
              *
              * @param shape Shape to be added to the scene.
              */
-            auto add(S shape) -> void;
+            auto add(S<T> shape) -> void;
 
             /**
              * @brief Adds several shapes to the scene.
              *
              * @param shapes Array of shapes to be added to the scene.
              */
-            auto add(std::span<S> shapes) -> void;
+            auto add(std::span<S<T>> shapes) -> void;
+
+            /**
+             * @brief Adds a single material to the scene.
+             *
+             * @param material Material to be added to the scene.
+             */
+            auto add(M<T> material) -> void;
+
+            /**
+             * @brief Adds several materials to the scene.
+             *
+             * @param materials Array of materials to be added to the scene.
+             */
+            auto add(std::span<M<T>> materials) -> void;
+
+            /**
+             * @brief Adds a single medium to the scene.
+             *
+             * @param medium Medium to be added to the scene.
+             */
+            auto add(D<T> medium) -> void;
+
+            /**
+             * @brief Adds several mediums to the scene.
+             *
+             * @param mediums Array of mediums to be added to the scene.
+             */
+            auto add(std::span<D<T>> mediums) -> void;
 
             /**
              * @brief Adds a single mesh to the scene.
@@ -131,14 +190,42 @@ namespace AGPTracer { namespace Entities {
              *
              * @param shape Shape to be removed from the scene.
              */
-            auto remove(S shape) -> void;
+            auto remove(S<T> shape) -> void;
 
             /**
              * @brief Removes multiple shapes from a scene.
              *
              * @param shapes Array of shapes to be removed from the scene.
              */
-            auto remove(std::span<S> shapes) -> void;
+            auto remove(std::span<S<T>> shapes) -> void;
+
+            /**
+             * @brief Removes a single material from the scene.
+             *
+             * @param material Material to be removed from the scene.
+             */
+            auto remove(M<T> material) -> void;
+
+            /**
+             * @brief Removes multiple materials from a scene.
+             *
+             * @param materials Array of materials to be removed from the scene.
+             */
+            auto remove(std::span<M<T>> materials) -> void;
+
+            /**
+             * @brief Removes a single medium from the scene.
+             *
+             * @param medium Medium to be removed from the scene.
+             */
+            auto remove(D<T> medium) -> void;
+
+            /**
+             * @brief Removes multiple mediums from a scene.
+             *
+             * @param mediums Array of mediums to be removed from the scene.
+             */
+            auto remove(std::span<D<T>> mediums) -> void;
 
             /**
              * @brief Removes a mesh from the scene.
@@ -170,7 +257,7 @@ namespace AGPTracer { namespace Entities {
              *
              * @param queue Queue on which to submit the update.
              */
-            auto update(cl::sycl::queue& queue) -> void;
+            auto update(sycl::queue& queue) -> void;
 
             /**
              * @brief Builds an acceleration structure with the scene's shapes.
@@ -183,24 +270,28 @@ namespace AGPTracer { namespace Entities {
             /**
              * @brief Intersects the scene shapes directly one by one. Not to be used for general operation.
              *
+             * @tparam N Number of mediums in the ray's medium list
              * @param[in] cgh Device handler for the device the code is running on.
              * @param[in] ray Ray to be intersected with the scene, using its current origin and direction.
              * @param[out] t Distance to intersection. It is stored in t if there is an intersection.
              * @param[out] uv 2D object-space coordinates of the intersection.
-             * @return std::optional<S&> Reference to the intersected shape. Returns none if there is no intersection.
+             * @return std::optional<std::reference_wrapper<S<T>>> Reference to the intersected shape. Returns none if there is no intersection.
              */
-            auto intersect_brute(cl::sycl::handler& cgh, const Ray_t<T>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<S&>;
+            template<size_t N>
+            auto intersect_brute(sycl::handler& cgh, const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<std::reference_wrapper<S<T>>>;
 
             /**
              * @brief Intersects the scene using the acceleration structure. Main way to intersect shapes.
              *
+             * @tparam N Number of mediums in the ray's medium list
              * @param[in] cgh Device handler for the device the code is running on.
              * @param[in] ray Ray to be intersected with the scene, using its current origin and direction.
              * @param[out] t Distance to intersection. It is stored in t if there is an intersection.
              * @param[out] uv 2D object-space coordinates of the intersection.
-             * @return std::optional<S&> Reference to the intersected shape. Returns none if there is no intersection.
+             * @return std::optional<std::reference_wrapper<S<T>>> Reference to the intersected shape. Returns none if there is no intersection.
              */
-            // auto intersect(cl::sycl::handler& cgh, const Ray_t<T>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<S&>;
+            // template<size_t N>
+            // auto intersect(sycl::handler& cgh, const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<std::reference_wrapper<S<T>>>;
 
             /**
              * @brief Intersects the ray with objects in the scene and bounces it on their material.
@@ -213,14 +304,24 @@ namespace AGPTracer { namespace Entities {
              * it won't be bounced on the hit object's material, as it intersects the medium instead of
              * the object.
              *
+             * @tparam R Random generator type
              * @tparam K Skybox type to intersect
+             * @tparam N Number of mediums in the ray's medium list
+             * @param[in] random_generator Random generator used to get random numbers.
              * @param[in] cgh Device handler for the device the code is running on.
              * @param[in] ray Ray to intersect with the scene.
              * @param[in] max_bounces Upper bound of number of bounces. Number of bounces may be less if no object is hit or ray can't be illuminated anymore.
              * @param[in] skybox Skybox that will be intersected if no object is hit.
              */
-            template<class K>
-            auto raycast(cl::sycl::handler& cgh, Ray_t<T>& ray, unsigned int max_bounces, const K& skybox) const -> void;
+            template<class R, template<typename> typename K, size_t N>
+            requires Entities::Skybox<K, T> auto raycast(R& random_generator, sycl::handler& cgh, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void;
+
+            /**
+             * @brief Get a Accessor_t object attached to this scene
+             *
+             * @return Accessor_t Accessor that can be used on the device to query the scene
+             */
+            auto getAccessor(sycl::handler& cgh) -> Accessor_t;
     };
 }}
 
