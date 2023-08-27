@@ -24,7 +24,7 @@ namespace AGPTracer {
 #include "Texture_t.hpp"
 #include "TransformMatrix_t.hpp"
 #include "Translucent.hpp"
+#include "UniformDistribution_t.hpp"
 #include "Vec3.hpp"
-
 
 #endif

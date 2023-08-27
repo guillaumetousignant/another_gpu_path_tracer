@@ -287,9 +287,10 @@ auto AGPTracer::Entities::Scene_t<T, S, M, D>::intersect(const Ray_t& ray, doubl
 }*/
 
 template<typename T, template<typename> typename S, template<typename> typename M, template<typename> typename D>
-requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&& AGPTracer::Entities::Medium<D, T> template<class R, template<typename> typename K, size_t N>
-requires AGPTracer::Entities::Skybox<K, T> auto
-AGPTracer::Entities::Scene_t<T, S, M, D>::raycast(R& rng, std::uniform_real_distribution<T>& unif, sycl::handler& cgh, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void {
+requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&&
+    AGPTracer::Entities::Medium<D, T> template<class R, template<typename> typename U, template<typename> typename K, size_t N>
+    requires AGPTracer::Entities::Skybox<K, T> auto
+    AGPTracer::Entities::Scene_t<T, S, M, D>::raycast(R& rng, U<T>& unif, sycl::handler& cgh, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void {
     unsigned int bounces = 0;
 
     constexpr T minimum_mask = 0.01;
@@ -329,9 +330,10 @@ AGPTracer::Entities::Scene_t<T, S, M, D>::Accessor_t::Accessor_t(sycl::handler& 
         mediums_(mediums.template get_access<sycl::access::mode::read>(cgh)) {}
 
 template<typename T, template<typename> typename S, template<typename> typename M, template<typename> typename D>
-requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&& AGPTracer::Entities::Medium<D, T> template<class R, template<typename> typename K, size_t N>
-requires AGPTracer::Entities::Skybox<K, T> auto
-AGPTracer::Entities::Scene_t<T, S, M, D>::Accessor_t::raycast(R& rng, std::uniform_real_distribution<T>& unif, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void {
+requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&&
+    AGPTracer::Entities::Medium<D, T> template<class R, template<typename> typename U, template<typename> typename K, size_t N>
+    requires AGPTracer::Entities::Skybox<K, T> auto
+    AGPTracer::Entities::Scene_t<T, S, M, D>::Accessor_t::raycast(R& rng, U<T>& unif, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void {
     unsigned int bounces = 0;
 
     constexpr T minimum_mask = 0.01;

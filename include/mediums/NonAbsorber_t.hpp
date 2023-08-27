@@ -35,6 +35,7 @@ namespace AGPTracer { namespace Mediums {
              * This medium doesn't interact with light, and as such a ray is not changed here.
              *
              * @tparam R Random generator type to use
+             * @tparam U Random distribution type to use
              * @tparam N Number of mediums in the ray's medium list
              * @param rng Random generator used to get random numbers
              * @param unif Uniform distribution used to get random numbers
@@ -43,8 +44,8 @@ namespace AGPTracer { namespace Mediums {
              * absorber.
              * @return false Returns false when the ray's path has not been changed, and it should bounce on the intersected material as planned. Always the case for a non absorber.
              */
-            template<class R, size_t N>
-            auto scatter(R& rng, std::uniform_real_distribution<T>& unif, Entities::Ray_t<T, N>& ray) const -> bool;
+            template<class R, template<typename> typename U, size_t N>
+            auto scatter(R& rng, U<T>& unif, Entities::Ray_t<T, N>& ray) const -> bool;
     };
 }}
 

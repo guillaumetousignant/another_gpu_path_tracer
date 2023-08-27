@@ -47,6 +47,7 @@ namespace AGPTracer { namespace Materials {
              * above the hit point to model diffuse reflection.
              *
              * @tparam R Random generator type to use
+             * @tparam U Random distribution type to use
              * @tparam S Shape that was intersected
              * @tparam N Number of mediums in the ray's medium list
              * @param rng Random generator used to get random numbers
@@ -55,8 +56,8 @@ namespace AGPTracer { namespace Materials {
              * @param hit_obj Pointer to the shape that was hit by the ray.
              * @param ray Ray that has intersected the shape.
              */
-            template<class R, template<typename> typename S, size_t N>
-            requires Entities::Shape<S, T> auto bounce(R& rng, std::uniform_real_distribution<T>& unif, std::array<T, 2> uv, const S<T>& hit_obj, AGPTracer::Entities::Ray_t<T, N>& ray) const -> void;
+            template<class R, template<typename> typename U, template<typename> typename S, size_t N>
+            requires Entities::Shape<S, T> auto bounce(R& rng, U<T>& unif, std::array<T, 2> uv, const S<T>& hit_obj, AGPTracer::Entities::Ray_t<T, N>& ray) const -> void;
     };
 }}
 

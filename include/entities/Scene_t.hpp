@@ -57,6 +57,7 @@ namespace AGPTracer { namespace Entities {
                      * the object.
                      *
                      * @tparam R Random generator type
+                     * @tparam U Random distribution type to use
                      * @tparam K Skybox type to intersect
                      * @tparam N Number of mediums in the ray's medium list
                      * @param[in] rng Random generator used to get random numbers.
@@ -65,8 +66,8 @@ namespace AGPTracer { namespace Entities {
                      * @param[in] max_bounces Upper bound of number of bounces. Number of bounces may be less if no object is hit or ray can't be illuminated anymore.
                      * @param[in] skybox Skybox that will be intersected if no object is hit.
                      */
-                    template<class R, template<typename> typename K, size_t N>
-                    requires Entities::Skybox<K, T> auto raycast(R& rng, std::uniform_real_distribution<T>& unif, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void;
+                    template<class R, template<typename> typename U, template<typename> typename K, size_t N>
+                    requires Entities::Skybox<K, T> auto raycast(R& rng, U<T>& unif, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void;
 
                     /**
                      * @brief Intersects the scene shapes directly one by one. Not to be used for general operation.
@@ -316,9 +317,8 @@ namespace AGPTracer { namespace Entities {
              * @param[in] max_bounces Upper bound of number of bounces. Number of bounces may be less if no object is hit or ray can't be illuminated anymore.
              * @param[in] skybox Skybox that will be intersected if no object is hit.
              */
-            template<class R, template<typename> typename K, size_t N>
-            requires Entities::Skybox<K, T> auto raycast(R& rng, std::uniform_real_distribution<T>& unif, sycl::handler& cgh, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const
-                -> void;
+            template<class R, template<typename> typename U, template<typename> typename K, size_t N>
+            requires Entities::Skybox<K, T> auto raycast(R& rng, U<T>& unif, sycl::handler& cgh, Ray_t<T, N>& ray, unsigned int max_bounces, const K<T>& skybox) const -> void;
 
             /**
              * @brief Get a Accessor_t object attached to this scene
