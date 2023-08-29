@@ -1,10 +1,10 @@
-#ifdef APTRACER_USE_JPEG
+#ifdef AGPTRACER_USE_JPEG
     #define cimg_use_jpeg
 #endif
-#ifdef APTRACER_USE_PNG
+#ifdef AGPTRACER_USE_PNG
     #define cimg_use_png
 #endif
-#ifdef APTRACER_USE_TIFF
+#ifdef AGPTRACER_USE_TIFF
     #define cimg_use_tiff
 #endif
 // #define cimg_use_tinyexr // Can't put this twice for some reason, is on in Texture_t.tpp
@@ -81,7 +81,7 @@ auto AGPTracer::Images::SimpleImage_t<T>::write(const std::filesystem::path& fil
         }
     }
 
-    image.save(filename.c_str());
+    image.save(filename.string().c_str());
 }
 
 template<typename T>
@@ -106,7 +106,7 @@ auto AGPTracer::Images::SimpleImage_t<T>::write(const std::filesystem::path& fil
         }
     }
 
-    image.save(filename.c_str());
+    image.save(filename.string().c_str());
 }
 
 template<typename T>

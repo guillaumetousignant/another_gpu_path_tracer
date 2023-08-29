@@ -25,26 +25,26 @@ AGPTracer::Entities::Texture_t<T>::Texture_t(const std::filesystem::path& filena
 
     if (extension == ".jpeg" || extension == ".jpg") {
         constexpr unsigned int bit_depth = 8;
-        image.load_jpeg(filename.c_str());
+        image.load_jpeg(filename.string().c_str());
         image /= std::pow(T{2}, bit_depth) - T{1}; // Normalizing by bit depth
     }
     else if (extension == ".png") {
         unsigned int bit_depth = 8;
-        image.load_png(filename.c_str(), &bit_depth);
+        image.load_png(filename.string().c_str(), &bit_depth);
         image /= std::pow(T{2}, bit_depth) - T{1}; // Normalizing by bit depth
     }
     else if (extension == ".exr") {
-        image.load_exr(filename.c_str());
+        image.load_exr(filename.string().c_str());
         image.pow(T{1} / T{2.2}); // Gamma correcting
     }
     else if (extension == ".hdr") {
         constexpr unsigned int bit_depth = 16;
-        image.load(filename.c_str());
+        image.load(filename.string().c_str());
         image /= std::pow(T{2}, bit_depth) - T{1}; // Normalizing by bit depth
     }
     else {
         constexpr unsigned int bit_depth = 8;
-        image.load(filename.c_str());
+        image.load(filename.string().c_str());
         image /= std::pow(T{2}, bit_depth) - T{1}; // Normalizing by bit depth
     }
 
