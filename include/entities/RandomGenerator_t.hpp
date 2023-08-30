@@ -53,6 +53,34 @@ namespace AGPTracer { namespace Entities {
                 }
             };
 
+            /**
+             * @brief Construct a new RandomGenerator_t object on the device with the given dimensions.
+             *
+             * @param queue Device queue to use to populate the vectors.
+             * @param size_x Horizontal number of pixels in the image.
+             * @param size_y Vertical number of pixels in the image.
+             */
+            RandomGenerator_t(sycl::queue& queue, size_t size_x, size_t size_y) : size_x_(size_x), size_y_(size_y), rng_(sycl::range<2>{size_x, size_y}), unif_(sycl::range<2>{size_x, size_y}) {
+                std::random_device rdev;
+                const auto seed = rdev();
+
+                // Size of index space for kernel
+                const sycl::range<2> num_work_items{size_x_, size_y_};
+
+                // Submitting command group(work) to queue
+                queue.submit([&](sycl::handler& cgh) {
+                    // Getting read write access to the buffer on a device
+                    sycl::accessor rng_accessor{rng_, cgh, sycl::write_only, sycl::no_init};
+                    sycl::accessor unif_accessor{unif_, cgh, sycl::write_only, sycl::no_init};
+
+                    // Executing kernel
+                    cgh.parallel_for<class RandomGeneratorConstructor>(num_work_items, [=](sycl::item<2> WIitem) {
+                        rng_accessor[WIitem]  = R(seed + WIitem.get_linear_id());
+                        unif_accessor[WIitem] = U<T>(0, 1);
+                    });
+                });
+            };
+
             size_t size_x_; /**< @brief Horizontal number of pixels in the image.*/
             size_t size_y_; /**< @brief Vertical number of pixels in the image.*/
             sycl::buffer<R, 2> rng_; /**< @brief Vector of shapes to be drawn.*/
@@ -61,6 +89,7 @@ namespace AGPTracer { namespace Entities {
             /**
              * @brief Get a Accessor_t object attached to this random generator
              *
+             * @param cgh Device context to use to get access.
              * @return Accessor_t Accessor that can be used on the device to query the random generator
              */
             auto getAccessor(sycl::handler& cgh) -> Accessor_t {

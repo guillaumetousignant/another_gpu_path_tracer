@@ -26,18 +26,18 @@ using AGPTracer::Shapes::Triangle_t;
 constexpr size_t TRIANGLE_BUFFER_SIZE = 12;
 auto get_triangles() -> std::array<Triangle_t<double>, TRIANGLE_BUFFER_SIZE> {
     return {
-        Triangle_t<double>{0, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 2, 0}, Vec3<double>{1, 2, 0}, Vec3<double>{0, 2, 1}}, {}, {}},
-        Triangle_t<double>{1, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 2, 0}, Vec3<double>{1, 2, 1}, Vec3<double>{0, 2, 1}}, {}, {}},
-        Triangle_t<double>{2, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 3, 0}, Vec3<double>{0, 3, 0}, Vec3<double>{0, 3, 1}}, {}, {}},
-        Triangle_t<double>{3, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 3, 1}, Vec3<double>{1, 3, 1}, Vec3<double>{1, 3, 0}}, {}, {}},
-        Triangle_t<double>{4, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 2, 0}, Vec3<double>{0, 2, 0}, Vec3<double>{0, 3, 0}}, {}, {}},
-        Triangle_t<double>{0, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 3, 0}, Vec3<double>{1, 3, 0}, Vec3<double>{1, 2, 0}}, {}, {}},
-        Triangle_t<double>{1, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 3, 1}, Vec3<double>{0, 2, 1}, Vec3<double>{1, 2, 1}}, {}, {}},
-        Triangle_t<double>{2, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 2, 1}, Vec3<double>{1, 3, 1}, Vec3<double>{0, 3, 1}}, {}, {}},
-        Triangle_t<double>{3, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 3, 1}, Vec3<double>{1, 2, 1}, Vec3<double>{1, 2, 0}}, {}, {}},
-        Triangle_t<double>{4, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 2, 0}, Vec3<double>{1, 3, 0}, Vec3<double>{1, 3, 1}}, {}, {}},
-        Triangle_t<double>{0, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 2, 0}, Vec3<double>{0, 2, 1}, Vec3<double>{0, 3, 1}}, {}, {}},
-        Triangle_t<double>{1, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 3, 1}, Vec3<double>{0, 3, 0}, Vec3<double>{0, 2, 0}}, {}, {}}
+        Triangle_t<double>{0, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{-2, 4, 2}, Vec3<double>{-2, 4, 0}, Vec3<double>{0, 4, 0}},    {}, {}},
+        Triangle_t<double>{1, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{-3, 3, -1}, Vec3<double>{-3, 3, -3}, Vec3<double>{0, 3, -1}}, {}, {}},
+        Triangle_t<double>{2, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{-3, 4, -3}, Vec3<double>{0, 4, -3}, Vec3<double>{0, 4, -1}},  {}, {}},
+        Triangle_t<double>{3, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 5, 0}, Vec3<double>{0, 5, -4}, Vec3<double>{4, 5, -4}},    {}, {}},
+        Triangle_t<double>{4, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 2, 0}, Vec3<double>{0, 2, 0}, Vec3<double>{0, 3, 0}},      {}, {}},
+        Triangle_t<double>{0, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 3, 0}, Vec3<double>{1, 3, 0}, Vec3<double>{1, 2, 0}},      {}, {}},
+        Triangle_t<double>{1, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 3, 1}, Vec3<double>{0, 2, 1}, Vec3<double>{1, 2, 1}},      {}, {}},
+        Triangle_t<double>{2, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 2, 1}, Vec3<double>{1, 3, 1}, Vec3<double>{0, 3, 1}},      {}, {}},
+        Triangle_t<double>{3, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 3, 1}, Vec3<double>{1, 2, 1}, Vec3<double>{1, 2, 0}},      {}, {}},
+        Triangle_t<double>{4, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{1, 2, 0}, Vec3<double>{1, 3, 0}, Vec3<double>{1, 3, 1}},      {}, {}},
+        Triangle_t<double>{0, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 2, 0}, Vec3<double>{0, 2, 1}, Vec3<double>{0, 3, 1}},      {}, {}},
+        Triangle_t<double>{1, TransformMatrix_t{}, std::array<Vec3<double>, 3>{Vec3<double>{0, 3, 1}, Vec3<double>{0, 3, 0}, Vec3<double>{0, 2, 0}},      {}, {}}
     };
 }
 
@@ -61,8 +61,18 @@ auto get_mediums() -> std::array<NonAbsorber_t<double>, MEDIUMS_BUFFER_SIZE> {
 
 auto main() -> int {
     try {
-        constexpr size_t size_x = 3000;
-        constexpr size_t size_y = 2000;
+        std::cout << "Devices:" << std::endl;
+        for (auto device: sycl::device::get_devices()) {
+            std::cout << '\t' << device.get_info<sycl::info::device::platform>().get_info<sycl::info::platform::name>() << ": " << device.get_info<sycl::info::device::name>() << std::endl;
+        }
+
+        // Creating SYCL queue
+        sycl::queue queue(sycl::default_selector_v);
+
+        std::cout << "Selected " << queue.get_info<sycl::info::queue::device>().get_info<sycl::info::device::name>() << std::endl << std::endl;
+
+        constexpr size_t size_x = 600;
+        constexpr size_t size_y = 400;
         const AGPTracer::Shapes::Triangle_t<double> triangle{
             0, TransformMatrix_t{},
              std::array<Vec3<double>, 3>{Vec3<double>{0, 2, 0}, Vec3<double>{1, 2, 0}, Vec3<double>{0, 2, 1}},
@@ -70,12 +80,13 @@ auto main() -> int {
              {}
         };
         const AGPTracer::Entities::MeshGeometry_t<double> geom("assets/Zombie_Beast4.obj");
-        const AGPTracer::Skyboxes::SkyboxFlat_t<double> skybox_flat(Vec3<double>{0.75, 0.75, 0.75});
+        const AGPTracer::Skyboxes::SkyboxFlat_t<double> skybox_flat(Vec3<double>{0.75, 0.75, 0.99});
         auto triangles = get_triangles();
         auto materials = get_materials();
         auto mediums   = get_mediums();
         AGPTracer::Entities::Scene_t<double, Triangle_t, Diffuse_t, NonAbsorber_t> scene(triangles, materials, mediums);
-        AGPTracer::Entities::RandomGenerator_t<double, std::mt19937, AGPTracer::Entities::UniformDistribution_t> random_generator(size_x,
+        AGPTracer::Entities::RandomGenerator_t<double, std::mt19937, AGPTracer::Entities::UniformDistribution_t> random_generator(queue,
+                                                                                                                                  size_x,
                                                                                                                                   size_y); // std::uniform_real_distribution doesn't compile on cuda :(
         const AGPTracer::Materials::Diffuse_t<double> diffuse(Vec3<double>(0, 0, 0), Vec3<double>(0.5, 0.5, 0.5), 1);
         const AGPTracer::Mediums::NonAbsorber_t<double> non_absorber(1, 32);
@@ -89,15 +100,7 @@ auto main() -> int {
         spherical_camera.transformation_.translate(Vec3<double>(0, -2, 0));
         spherical_camera.update();
 
-        std::cout << "Devices:" << std::endl;
-        for (auto device: sycl::device::get_devices()) {
-            std::cout << '\t' << device.get_info<sycl::info::device::platform>().get_info<sycl::info::platform::name>() << ": " << device.get_info<sycl::info::device::name>() << std::endl;
-        }
-
-        // Creating SYCL queue
-        sycl::queue queue(sycl::default_selector_v);
-
-        std::cout << "Selected " << queue.get_info<sycl::info::queue::device>().get_info<sycl::info::device::name>() << std::endl << std::endl;
+        std::cout << "Initialisation finished" << std::endl;
 
         spherical_camera.accumulate(queue, random_generator, scene, 100);
         spherical_camera.write("test.png");
