@@ -13,7 +13,7 @@ requires AGPTracer::Entities::Shape<S, T> auto AGPTracer::Materials::Diffuse_t<T
 
     const T rand1  = unif(rng) * T{2} * std::numbers::pi_v<T>;
     const T rand2  = unif(rng);
-    const T rand2s = sqrt(rand2);
+    const T rand2s = sycl::sqrt(rand2);
 
     if (normal.dot(ray.direction_) > T{0}) {
         normal = -normal;
@@ -24,11 +24,11 @@ requires AGPTracer::Entities::Shape<S, T> auto AGPTracer::Materials::Diffuse_t<T
     const AGPTracer::Entities::Vec3<T> u = axis.cross(normal).normalize_inplace();
     const AGPTracer::Entities::Vec3<T> v = normal.cross(u).normalize_inplace(); // wasn't normalized before
 
-    const AGPTracer::Entities::Vec3<T> newdir = (u * cos(rand1) * rand2s + v * sin(rand1) * rand2s + normal * sqrt(T{1} - rand2)).normalize_inplace();
+    const AGPTracer::Entities::Vec3<T> newdir = (u * sycl::cos(rand1) * rand2s + v * sycl::sin(rand1) * rand2s + normal * sycl::sqrt(T{1} - rand2)).normalize_inplace();
 
-    ray.origin_ += ray.direction_ * ray.dist_ + normal * T{0.00001}; //*ray.dist_; // Made EPSILON relative, check // well guess what wasn't a good idea
+    ray.origin_ += ray.direction_ * ray.dist_ + normal * T{0.00001}; // *ray.dist_; // Made EPSILON relative, check // well guess what wasn't a good idea
     ray.direction_ = newdir;
 
     ray.colour_ += ray.mask_ * emission_;
-    ray.mask_ *= colour_ * pow(newdir.dot(normal), roughness_);
+    ray.mask_ *= colour_ * sycl::pow(newdir.dot(normal), roughness_);
 }
