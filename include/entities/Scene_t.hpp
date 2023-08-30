@@ -76,10 +76,10 @@ namespace AGPTracer { namespace Entities {
                      * @param[in] ray Ray to be intersected with the scene, using its current origin and direction.
                      * @param[out] t Distance to intersection. It is stored in t if there is an intersection.
                      * @param[out] uv 2D object-space coordinates of the intersection.
-                     * @return std::optional<std::reference_wrapper<S<T>>> Reference to the intersected shape. Returns none if there is no intersection.
+                     * @return std::optional<size_t> Index of the intersected shape. Returns none if there is no intersection.
                      */
                     template<size_t N>
-                    auto intersect_brute(const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<std::reference_wrapper<S<T>>>;
+                    auto intersect_brute(const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<size_t>;
 
                     /**
                      * @brief Intersects the scene using the acceleration structure. Main way to intersect shapes.
@@ -278,10 +278,10 @@ namespace AGPTracer { namespace Entities {
              * @param[in] ray Ray to be intersected with the scene, using its current origin and direction.
              * @param[out] t Distance to intersection. It is stored in t if there is an intersection.
              * @param[out] uv 2D object-space coordinates of the intersection.
-             * @return std::optional<std::reference_wrapper<S<T>>> Reference to the intersected shape. Returns none if there is no intersection.
+             * @return std::optional<size_t> Index of the intersected shape. Returns none if there is no intersection.
              */
             template<size_t N>
-            auto intersect_brute(sycl::handler& cgh, const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<std::reference_wrapper<S<T>>>;
+            auto intersect_brute(sycl::handler& cgh, const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<size_t>;
 
             /**
              * @brief Intersects the scene using the acceleration structure. Main way to intersect shapes.

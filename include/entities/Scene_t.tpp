@@ -262,21 +262,22 @@ auto AGPTracer::Entities::Scene_t<T, S, M, D>::build_acc() -> void {
 
 template<typename T, template<typename> typename S, template<typename> typename M, template<typename> typename D>
 requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&& AGPTracer::Entities::Medium<D, T> template<size_t N>
-auto AGPTracer::Entities::Scene_t<T, S, M, D>::intersect_brute(sycl::handler& cgh, const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<std::reference_wrapper<S<T>>> {
+auto AGPTracer::Entities::Scene_t<T, S, M, D>::intersect_brute(sycl::handler& cgh, const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<size_t> {
     T t_temp = std::numeric_limits<T>::max();
     std::array<T, 2> uv_temp{};
 
     t = std::numeric_limits<T>::max();
-    std::optional<std::reference_wrapper<S<T>>> hit_obj{};
+    std::optional<size_t> hit_obj{};
 
     auto accessor = shapes_.get_access<sycl::access::mode::read>(cgh);
-    for (auto shape: accessor) {
-        if (shape.intersection(ray, t_temp, uv_temp) && (t_temp < t)) {
-            hit_obj = shape;
+    for (size_t i = 0; i < shapes_.get_range()[0]; ++i) {
+        if (accessor[i].intersection(ray, t_temp, uv_temp) && (t_temp < t)) {
+            hit_obj = i;
             uv      = uv_temp;
             t       = t_temp;
         }
     }
+
     return hit_obj;
 }
 
@@ -299,7 +300,7 @@ requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&
         std::array<T, 2> uv{};
 
         // const std::optional<std::reference_wrapper<S<T>>> hit_obj = acc_->intersect(ray, t, uv);
-        const std::optional<std::reference_wrapper<S<T>>> hit_obj = intersect_brute(cgh, ray, t, uv);
+        const std::optional<size_t> hit_obj = intersect_brute(cgh, ray, t, uv);
 
         if (!hit_obj) {
             ray.colour_ += ray.mask_ * skybox.get(ray.direction_);
@@ -309,9 +310,10 @@ requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&
         ++bounces;
 
         auto medium_accessor = mediums_.get_access<sycl::access::mode::read>(cgh);
+        auto shape_accessor  = shapes_.get_access<sycl::access::mode::read>(cgh);
         if (!medium_accessor[ray.medium_list_[0]].scatter(ray)) {
             auto material_accessor = materials_.get_access<sycl::access::mode::read>(cgh);
-            material_accessor[hit_obj->material_].bounce(rng, unif, uv, *hit_obj, ray);
+            material_accessor[shape_accessor[hit_obj].material_].bounce(rng, unif, uv, shape_accessor[hit_obj], ray);
         }
     }
 }
@@ -342,7 +344,7 @@ requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&
         std::array<T, 2> uv{};
 
         // const std::optional<std::reference_wrapper<S<T>>> hit_obj = acc_->intersect(ray, t, uv);
-        const std::optional<std::reference_wrapper<S<T>>> hit_obj = intersect_brute(ray, t, uv);
+        const std::optional<size_t> hit_obj = intersect_brute(ray, t, uv);
 
         if (!hit_obj) {
             ray.colour_ += ray.mask_ * skybox.get(ray.direction_);
@@ -352,27 +354,28 @@ requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&
         ++bounces;
 
         if (!mediums_[ray.medium_list_.mediums_[0]].scatter(rng, unif, ray)) {
-            materials_[hit_obj->get().material_].bounce(rng, unif, uv, hit_obj->get(), ray);
+            materials_[shapes_[hit_obj.value()].material_].bounce(rng, unif, uv, shapes_[hit_obj.value()], ray);
         }
     }
 }
 
 template<typename T, template<typename> typename S, template<typename> typename M, template<typename> typename D>
 requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&& AGPTracer::Entities::Medium<D, T> template<size_t N>
-auto AGPTracer::Entities::Scene_t<T, S, M, D>::Accessor_t::intersect_brute(const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<std::reference_wrapper<S<T>>> {
+auto AGPTracer::Entities::Scene_t<T, S, M, D>::Accessor_t::intersect_brute(const Ray_t<T, N>& ray, T& t, std::array<T, 2>& uv) const -> std::optional<size_t> {
     T t_temp = std::numeric_limits<T>::max();
     std::array<T, 2> uv_temp{};
 
     t = std::numeric_limits<T>::max();
-    std::optional<std::reference_wrapper<S<T>>> hit_obj{};
+    std::optional<size_t> hit_obj{};
 
-    for (auto shape: shapes_) {
-        if (shape.intersection(ray, t_temp, uv_temp) && (t_temp < t)) {
-            hit_obj = shape;
+    for (size_t i = 0; i < shapes_.get_range()[0]; ++i) {
+        if (shapes_[i].intersection(ray, t_temp, uv_temp) && (t_temp < t)) {
+            hit_obj = i;
             uv      = uv_temp;
             t       = t_temp;
         }
     }
+
     return hit_obj;
 }
 
