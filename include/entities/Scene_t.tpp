@@ -354,7 +354,7 @@ requires AGPTracer::Entities::Shape<S, T>&& AGPTracer::Entities::Material<M, T>&
         ++bounces;
 
         if (!mediums_[ray.medium_list_.mediums_[0]].scatter(rng, unif, ray)) {
-            materials_[shapes_[hit_obj.value()].material_].bounce(rng, unif, uv, shapes_[hit_obj.value()], ray);
+            materials_[shapes_[*hit_obj].material_].bounce(rng, unif, uv, shapes_[*hit_obj], ray);
         }
     }
 }
