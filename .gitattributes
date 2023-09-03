@@ -1,8 +1,14 @@
+.clang-format linguist-vendored
+.clang-tidy linguist-vendored
 .gitignore linguist-vendored
-.makeignore linguist-vendored
 LICENSE linguist-vendored
 README.md linguist-vendored
+requirements.txt linguist-vendored
 catch.hpp linguist-vendored
+include/external/CImg.h linguist-vendored
+include/external/json.hpp linguist-vendored
+include/external/Licence_CeCILL_V2-en.txt linguist-vendored
+include/external/tinyexr.h linguist-vendored
 
 * text=auto eol=crlf
 *.{cmd,[cC][mM][dD]} text eol=crlf
