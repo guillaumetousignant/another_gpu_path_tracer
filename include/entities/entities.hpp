@@ -17,6 +17,7 @@ namespace AGPTracer {
 #include "MediumList_t.hpp"
 #include "MeshGeometry_t.hpp"
 #include "RandomGenerator_t.hpp"
+#include "RandomNumberGenerator_t.hpp"
 #include "Ray_t.hpp"
 #include "Scene_t.hpp"
 #include "Shape.hpp"
