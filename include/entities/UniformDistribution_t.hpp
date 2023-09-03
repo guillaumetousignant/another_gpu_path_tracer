@@ -7,13 +7,13 @@ namespace AGPTracer { namespace Entities {
     /**
      * @brief The uniform distribution class represent an uniform distribution of random numbers.
      *
-     * @tparam T MFloating point type
+     * @tparam T Floating point type
      */
     template<typename T = double>
     class UniformDistribution_t {
         public:
             /**
-             * @brief Constructs a new MediumList_t object.
+             * @brief Constructs a new UniformDistribution_t object.
              */
             constexpr UniformDistribution_t(T min, T max) : min_{min}, span_{max - min} {};
 
