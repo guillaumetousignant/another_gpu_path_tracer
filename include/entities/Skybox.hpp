@@ -4,7 +4,7 @@
 #include "entities/Vec3.hpp"
 #include <concepts>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief Skyboxes represent the infinitely far background of a scene. Define how the ray gets coloured when it doesn't intersect geometry.
      *
@@ -18,6 +18,6 @@ namespace AGPTracer { namespace Entities {
     concept Skybox = requires(const K<T> a, const Vec3<T>& v) {
         { a.get(v) } -> std::convertible_to<Vec3<T>>;
     };
-}}
+}
 
 #endif

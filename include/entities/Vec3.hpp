@@ -8,7 +8,7 @@
 #include <sycl/sycl.hpp>
 #include <utility>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
 
     /**
      * @brief The Vec3 class represents a 3-element vector.
@@ -705,7 +705,7 @@ namespace AGPTracer { namespace Entities {
              */
             constexpr auto almost_equal(const Vec3<T>& other, const int ulp) const -> bool;
     };
-}}
+}
 
 /**
  * @brief Formats a vector to be displayed.

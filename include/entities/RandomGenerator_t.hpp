@@ -4,7 +4,7 @@
 #include <random>
 #include <sycl/sycl.hpp>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
 
     /**
      * @brief Holds the random generators used by the workers for each pixel
@@ -96,6 +96,6 @@ namespace AGPTracer { namespace Entities {
                 return Accessor_t(cgh, rng_, unif_);
             };
     };
-}}
+}
 
 #endif

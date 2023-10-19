@@ -4,7 +4,7 @@
 #include "entities/MediumList_t.hpp"
 #include "entities/Vec3.hpp"
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The ray class contains colour data and can be intersected with geometry.
      *
@@ -53,6 +53,6 @@ namespace AGPTracer { namespace Entities {
             MediumList_t<N> medium_list_; /**< @brief List of materials in which the ray travels. The first one is the current one.*/
             T time_; /**< @brief Time of emission of the ray, relative to exposure time. 0 for start of exposure to 1 for end.*/
     };
-}}
+}
 
 #endif

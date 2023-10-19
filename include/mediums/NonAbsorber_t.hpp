@@ -4,7 +4,7 @@
 #include "entities/Ray_t.hpp"
 #include <random>
 
-namespace AGPTracer { namespace Mediums {
+namespace AGPTracer::Mediums {
 
     /**
      * @brief The non absorber class describes a medium that doesn't interact with light.
@@ -47,7 +47,7 @@ namespace AGPTracer { namespace Mediums {
             template<class R, template<typename> typename U, size_t N>
             auto scatter(R& rng, U<T>& unif, Entities::Ray_t<T, N>& ray) const -> bool;
     };
-}}
+}
 
 #include "mediums/NonAbsorber_t.tpp"
 

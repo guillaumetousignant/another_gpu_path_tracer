@@ -8,11 +8,7 @@
 #include <optional>
 #include <sycl/sycl.hpp>
 
-namespace AGPTracer { namespace Entities {
-    // class Material_t;
-}}
-
-namespace AGPTracer { namespace Shapes {
+namespace AGPTracer::Shapes {
     /**
      * @brief The triangle class defines a triangle shape that can be intersected by rays.
      *
@@ -157,7 +153,7 @@ namespace AGPTracer { namespace Shapes {
              */
             constexpr auto maxcoord() const -> AGPTracer::Entities::Vec3<T>;
     };
-}}
+}
 
 #include "shapes/Triangle_t.tpp"
 

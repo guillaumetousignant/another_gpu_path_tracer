@@ -5,7 +5,7 @@
 #include <array>
 #include <sycl/sycl.hpp>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
 
     /**
      * @brief The transformation matrix class represents a 4x4 3D transformation matrix, used to transform other objects in 3D space.
@@ -302,7 +302,7 @@ namespace AGPTracer { namespace Entities {
              */
             constexpr auto buildInverse() -> void;
     };
-}}
+}
 
 #include "entities/TransformMatrix_t.tpp"
 

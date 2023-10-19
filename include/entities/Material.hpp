@@ -7,7 +7,7 @@
 #include <concepts>
 #include <random>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The material interface describes how light interacts with a specific material.
      *
@@ -23,6 +23,6 @@ namespace AGPTracer { namespace Entities {
     concept Material = requires(const M<T> a, std::mt19937& rng, std::uniform_real_distribution<T>& unif, std::array<T, 2> uv, const Shapes::Triangle_t<T>& hit_obj, Ray_t<T, 16>& ray) {
         { a.bounce(rng, unif, uv, hit_obj, ray) } -> std::convertible_to<void>;
     };
-}}
+}
 
 #endif

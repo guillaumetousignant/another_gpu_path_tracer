@@ -17,7 +17,7 @@
 #include <span>
 #include <sycl/sycl.hpp>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
 
     /**
      * @brief The scene class holds the shapes representing a scene to be rendered, and creates an acceleration structure containing them.
@@ -327,7 +327,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto getAccessor(sycl::handler& cgh) -> Accessor_t;
     };
-}}
+}
 
 #include "entities/Scene_t.tpp"
 

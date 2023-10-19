@@ -6,7 +6,7 @@
 #include "entities/Vec3.hpp"
 #include <random>
 
-namespace AGPTracer { namespace Materials {
+namespace AGPTracer::Materials {
 
     /**
      * @brief The diffuse class describes a material that reflects rays in random directions, to model diffuse reflection.
@@ -59,7 +59,7 @@ namespace AGPTracer { namespace Materials {
             template<class R, template<typename> typename U, template<typename> typename S, size_t N>
             requires Entities::Shape<S, T> auto bounce(R& rng, U<T>& unif, std::array<T, 2> uv, const S<T>& hit_obj, AGPTracer::Entities::Ray_t<T, N>& ray) const -> void;
     };
-}}
+}
 
 #include "materials/Diffuse_t.tpp"
 

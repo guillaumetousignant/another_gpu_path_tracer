@@ -33,10 +33,74 @@ if(USE_TIFF)
     set(TIFF_DEPENDENCY "find_dependency(TIFF REQUIRED)")
 endif()
 
+option(OPTIMIZE_FOR_NATIVE "Build with -march=native." OFF)
+if(OPTIMIZE_FOR_NATIVE)
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+
+    if(COMPILER_SUPPORTS_MARCH_NATIVE)
+        target_compile_options(AGPTracer PUBLIC -march=native)
+    endif()
+endif()
+
 target_compile_features(AGPTracer INTERFACE cxx_std_20)
 if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     set_property(TARGET AGPTracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif()
+
+install(TARGETS AGPTracer
+    EXPORT another_gpu_path_tracer-targets
+    DESTINATION lib)
+
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_INSTALL_PREFIX)
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+        DESTINATION include/another_gpu_path_tracer
+        FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN "*.hpp"
+        PATTERN "*.tpp")
+endif()
+
+if(WIN32)
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/
+        DESTINATION bin
+        FILES_MATCHING PATTERN "*.dll")
+endif()
+
+install(EXPORT another_gpu_path_tracer-targets
+    FILE
+    AGPTracerTargets.cmake
+    NAMESPACE
+    AGPTracer::
+    DESTINATION
+    lib/cmake/AGPTracer)
+
+# Create a ConfigVersion.cmake file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/AGPTracerConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/AGPTracerConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/AGPTracerConfig.cmake
+    INSTALL_DESTINATION lib/cmake/AGPTracer
+)
+
+# Install the config, configversion and custom find modules
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/AGPTracerConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/AGPTracerConfigVersion.cmake
+    DESTINATION lib/cmake/AGPTracer
+)
+
+export(EXPORT another_gpu_path_tracer-targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/AGPTracerTargets.cmake
+    NAMESPACE AGPTracer::)
+
+# Register package in user's package registry
+export(PACKAGE AGPTracer)
 
 add_executable(another_gpu_path_tracer 
     main.cpp)
@@ -44,10 +108,18 @@ add_executable(another_gpu_path_tracer
 target_link_libraries(another_gpu_path_tracer PRIVATE 
                                                 AGPTracer)
 
+if(OPTIMIZE_FOR_NATIVE)
+    if(COMPILER_SUPPORTS_MARCH_NATIVE)
+        target_compile_options(another_gpu_path_tracer PUBLIC -march=native)
+    endif()
+endif()
+
 target_compile_features(another_gpu_path_tracer PRIVATE cxx_std_20)
 if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     set_property(TARGET another_gpu_path_tracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif()
+
+install(TARGETS another_gpu_path_tracer DESTINATION bin)
 
 if(USE_OpenSYCL)
     if(NOT DEFINED OPENSYCL_TARGETS) # "cuda:sm_61" for GTX 1070, "cuda:sm_75" for T200

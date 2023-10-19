@@ -12,7 +12,7 @@
 #include <filesystem>
 #include <random>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The Raytrace interface describes an object that can cast rays into a scene.
      *
@@ -121,6 +121,6 @@ namespace AGPTracer { namespace Entities {
      */
     template<template<typename> typename C, typename T>
     concept Camera = Raytrace<C, T> && Accumulate<C, T> && Focus<C, T> && SetUp<C, T> && Zoom<C, T> && Write<C<T>> && Resetable<C<T>>;
-}}
+}
 
 #endif

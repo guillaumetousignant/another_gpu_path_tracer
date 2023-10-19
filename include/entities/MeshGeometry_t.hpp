@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
 
     /**
      * @brief The mesh geometry class represents a geometry made up of points and triangular faces.
@@ -74,7 +74,7 @@ namespace AGPTracer { namespace Entities {
              */
             auto build_missing_texture_coordinates(const std::vector<std::array<bool, 3>>& texture_coordinates_to_build) -> void;
     };
-}}
+}
 
 #include "entities/MeshGeometry_t.tpp"
 

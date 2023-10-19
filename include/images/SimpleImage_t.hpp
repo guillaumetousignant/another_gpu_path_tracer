@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <sycl/sycl.hpp>
 
-namespace AGPTracer { namespace Images {
+namespace AGPTracer::Images {
     /**
      * @brief The SimpleImage_t class represents an image, which can be modified, can accumulate samples, and can be written to disk.
      *
@@ -149,7 +149,7 @@ namespace AGPTracer { namespace Images {
              */
             auto getAccessor(sycl::handler& cgh) -> Accessor_t;
     };
-}}
+}
 
 #include "images/SimpleImage_t.tpp"
 

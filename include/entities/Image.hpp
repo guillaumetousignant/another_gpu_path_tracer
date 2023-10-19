@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <vector>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The ImageUpdatable interface describes an object that can be updated as in image.
      *
@@ -77,6 +77,6 @@ namespace AGPTracer { namespace Entities {
      */
     template<template<typename> typename I, typename T>
     concept Image = Resetable<I<T>> && ImageUpdatable<I, T> && Settable<I, T> && Writeable<I, T> && Shaped2D<I<T>>;
-}}
+}
 
 #endif

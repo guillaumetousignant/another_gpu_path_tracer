@@ -3,7 +3,7 @@
 
 #include "entities/Vec3.hpp"
 
-namespace AGPTracer { namespace Skyboxes {
+namespace AGPTracer::Skyboxes {
     /**
      * @brief The skybox flat class describes a flat coloured skybox.
      *
@@ -25,7 +25,7 @@ namespace AGPTracer { namespace Skyboxes {
 
             auto get(const AGPTracer::Entities::Vec3<T>& xyz) const -> AGPTracer::Entities::Vec3<T>;
     };
-}}
+}
 
 #include "skyboxes/SkyboxFlat_t.tpp"
 

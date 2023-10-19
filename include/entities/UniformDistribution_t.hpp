@@ -3,7 +3,7 @@
 
 #include <random>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The uniform distribution class represent an uniform distribution of random numbers.
      *
@@ -34,6 +34,6 @@ namespace AGPTracer { namespace Entities {
             T min_; /**< @brief Minimum number to generate.*/
             T span_; /**< @brief Maximum - minimum.*/
     };
-}}
+}
 
 #endif

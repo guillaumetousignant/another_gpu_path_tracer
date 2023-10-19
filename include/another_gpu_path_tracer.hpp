@@ -18,5 +18,4 @@ namespace AGPTracer {
 #include "shapes/shapes.hpp"
 #include "skyboxes/skyboxes.hpp"
 
-
 #endif

@@ -5,7 +5,7 @@
 #include <array>
 #include <sycl/sycl.hpp>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The medium list class represent a list of mediums into which a ray is travelling.
      *
@@ -83,6 +83,6 @@ namespace AGPTracer { namespace Entities {
                 }
             };
     };
-}}
+}
 
 #endif

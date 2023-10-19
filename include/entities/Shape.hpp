@@ -8,7 +8,7 @@
 #include <array>
 #include <concepts>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The Intersectable interface describes an object that can be intersected by a ray.
      *
@@ -85,6 +85,6 @@ namespace AGPTracer { namespace Entities {
      */
     template<template<typename> typename S, typename T>
     concept Shape = Updatable<S<T>> && Intersectable<S, T> && Geometric<S, T, T> && Coordinates<S, T> && Transformable<S, T> && HasMaterial<S<T>>;
-}}
+}
 
 #endif

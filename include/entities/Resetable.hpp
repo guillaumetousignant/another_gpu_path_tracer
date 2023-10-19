@@ -3,7 +3,7 @@
 
 #include <concepts>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The Resetable interface describes an object that can be reset.
      *
@@ -13,6 +13,6 @@ namespace AGPTracer { namespace Entities {
     concept Resetable = requires(T a) {
         { a.reset() } -> std::convertible_to<void>;
     };
-}}
+}
 
 #endif

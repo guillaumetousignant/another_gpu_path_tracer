@@ -3,7 +3,7 @@
 
 #include <concepts>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The Translucent interface describes an object through which light can pass.
      *
@@ -17,6 +17,6 @@ namespace AGPTracer { namespace Entities {
     &&requires(const D<T> a) {
         { a.priority_ } -> std::convertible_to<unsigned int>;
     };
-}}
+}
 
 #endif

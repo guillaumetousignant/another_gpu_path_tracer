@@ -3,7 +3,7 @@
 
 #include <concepts>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The Updatable interface describes an object that can be updated.
      *
@@ -13,6 +13,6 @@ namespace AGPTracer { namespace Entities {
     concept Updatable = requires(T a) {
         { a.update() } -> std::convertible_to<void>;
     };
-}}
+}
 
 #endif

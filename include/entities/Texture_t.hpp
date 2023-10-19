@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <sycl/sycl.hpp>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
 
     /**
      * @brief The texture class represents an image or other 2D buffer that can be accessed using 2D coordinates.
@@ -90,7 +90,7 @@ namespace AGPTracer { namespace Entities {
              */
             static auto CubicHermite(Vec3<T> first, Vec3<T> second, Vec3<T> third, Vec3<T> fourth, T t) -> Vec3<T>;
     };
-}}
+}
 
 #include "entities/Texture_t.tpp"
 

@@ -3,7 +3,7 @@
 
 #include <limits>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The random number generator class represent an engine to generate random numbers.
      *
@@ -37,6 +37,6 @@ namespace AGPTracer { namespace Entities {
         private:
             T state_; /**< @brief Internal state of the generator.*/
     };
-}}
+}
 
 #endif

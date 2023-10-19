@@ -6,7 +6,7 @@
 #include <concepts>
 #include <random>
 
-namespace AGPTracer { namespace Entities {
+namespace AGPTracer::Entities {
     /**
      * @brief The Scattering interface describes an object that can scatter a ray.
      *
@@ -33,6 +33,6 @@ namespace AGPTracer { namespace Entities {
      */
     template<template<typename> typename D, typename T>
     concept Medium = Scattering<D, T> && Translucent<D, T>;
-}}
+}
 
 #endif

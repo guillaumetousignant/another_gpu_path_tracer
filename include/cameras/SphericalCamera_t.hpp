@@ -17,7 +17,7 @@
 #include <random>
 #include <sycl/sycl.hpp>
 
-namespace AGPTracer { namespace Cameras {
+namespace AGPTracer::Cameras {
 
     /**
      * @brief The SphericalCamera_t class describes a camera that uses a spherical projection.
@@ -263,7 +263,7 @@ namespace AGPTracer { namespace Cameras {
              */
             auto reset() -> void;
     };
-}}
+}
 
 #include "cameras/SphericalCamera_t.tpp"
 
