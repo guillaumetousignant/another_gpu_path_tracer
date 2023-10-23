@@ -8,13 +8,17 @@ AGPTracer::Shapes::Triangle_t<T>::Triangle_t(size_t material,
                                              Entities::TransformMatrix_t<T> transform_matrix,
                                              std::array<AGPTracer::Entities::Vec3<T>, 3> points, // In c++26 sqrt is constexpr
                                              const std::optional<std::array<AGPTracer::Entities::Vec3<T>, 3>> normals,
-                                             const std::optional<std::array<T, 6>> texcoord) :
+                                             const std::optional<std::array<std::array<T, 2>, 3>> texcoord) :
         material_(material), transformation_(std::move(transform_matrix)), points_orig_{points} {
 
     const AGPTracer::Entities::Vec3<T> nor = (points_orig_[1] - points_orig_[0]).cross(points_orig_[2] - points_orig_[0]).normalize_inplace();
     normals_orig_                          = normals.value_or(std::array<AGPTracer::Entities::Vec3<T>, 3>{nor, nor, nor});
 
-    texture_coordinates_ = texcoord.value_or(std::array<T, 6>{0, 1, 0, 0, 1, 0});
+    texture_coordinates_ = texcoord.value_or(std::array<std::array<T, 2>, 3>{
+        std::array<T, 2>{0, 1},
+         std::array<T, 2>{0, 0},
+         std::array<T, 2>{1, 0}
+    });
 
     points_ = {transformation_.multVec(points_orig_[0]), transformation_.multVec(points_orig_[1]), transformation_.multVec(points_orig_[2])};
 
@@ -23,8 +27,8 @@ AGPTracer::Shapes::Triangle_t<T>::Triangle_t(size_t material,
     v0v1_ = points_[1] - points_[0];
     v0v2_ = points_[2] - points_[0];
 
-    const std::array<T, 2> tuv0v1 = {texture_coordinates_[2] - texture_coordinates_[0], texture_coordinates_[3] - texture_coordinates_[1]};
-    const std::array<T, 2> tuv0v2 = {texture_coordinates_[4] - texture_coordinates_[0], texture_coordinates_[5] - texture_coordinates_[1]};
+    const std::array<T, 2> tuv0v1 = {texture_coordinates_[1][0] - texture_coordinates_[0][0], texture_coordinates_[1][1] - texture_coordinates_[0][1]};
+    const std::array<T, 2> tuv0v2 = {texture_coordinates_[2][0] - texture_coordinates_[0][0], texture_coordinates_[2][1] - texture_coordinates_[0][1]};
 
     if (std::abs(tuv0v1[0] * tuv0v2[1] - tuv0v1[1] * tuv0v2[0]) >= std::numeric_limits<T>::min()) {
         const T invdet = 1.0 / (tuv0v1[0] * tuv0v2[1] - tuv0v1[1] * tuv0v2[0]);
@@ -98,8 +102,8 @@ template<class T2>
 constexpr auto AGPTracer::Shapes::Triangle_t<T>::normal_uv(T2 time, std::array<T, 2> uv, std::array<T, 2>& tuv) const -> AGPTracer::Entities::Vec3<T> {
     const AGPTracer::Entities::Vec3<T> distance = AGPTracer::Entities::Vec3<T>(1.0 - uv[0] - uv[1], uv[0], uv[1]);
     // Matrix multiplication, optimise.
-    tuv = {distance[0] * texture_coordinates_[0] + distance[1] * texture_coordinates_[2] + distance[2] * texture_coordinates_[4],
-           distance[0] * texture_coordinates_[1] + distance[1] * texture_coordinates_[3] + distance[2] * texture_coordinates_[5]};
+    tuv = {distance[0] * texture_coordinates_[0][0] + distance[1] * texture_coordinates_[1][0] + distance[2] * texture_coordinates_[2][0],
+           distance[0] * texture_coordinates_[0][1] + distance[1] * texture_coordinates_[1][1] + distance[2] * texture_coordinates_[2][1]};
     return {distance[0] * normals_[0][0] + distance[1] * normals_[1][0] + distance[2] * normals_[2][0],
             distance[0] * normals_[0][1] + distance[1] * normals_[1][1] + distance[2] * normals_[2][1],
             distance[0] * normals_[0][2] + distance[1] * normals_[1][2] + distance[2] * normals_[2][2]};
@@ -111,8 +115,8 @@ auto AGPTracer::Shapes::Triangle_t<T>::normal_uv_tangent(T2 time, std::array<T, 
     -> AGPTracer::Entities::Vec3<T> {
     const AGPTracer::Entities::Vec3<T> distance = AGPTracer::Entities::Vec3<T>(1.0 - uv[0] - uv[1], uv[0], uv[1]);
     // Matrix multiplication, optimise.
-    tuv = {distance[0] * texture_coordinates_[0] + distance[1] * texture_coordinates_[2] + distance[2] * texture_coordinates_[4],
-           distance[0] * texture_coordinates_[1] + distance[1] * texture_coordinates_[3] + distance[2] * texture_coordinates_[5]};
+    tuv = {distance[0] * texture_coordinates_[0][0] + distance[1] * texture_coordinates_[1][0] + distance[2] * texture_coordinates_[2][0],
+           distance[0] * texture_coordinates_[0][1] + distance[1] * texture_coordinates_[1][1] + distance[2] * texture_coordinates_[2][1]};
 
     const AGPTracer::Entities::Vec3<T> normalvec = AGPTracer::Entities::Vec3<T>(distance[0] * normals_[0][0] + distance[1] * normals_[1][0] + distance[2] * normals_[2][0],
                                                                                 distance[0] * normals_[0][1] + distance[1] * normals_[1][1] + distance[2] * normals_[2][1],

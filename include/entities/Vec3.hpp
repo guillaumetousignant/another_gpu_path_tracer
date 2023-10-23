@@ -22,7 +22,7 @@ namespace AGPTracer::Entities {
     class Vec3 {
         public:
             std::array<T, 3> v_; /**< @brief Array of the 3 values in the vector.*/
-        public:
+
             /**
              * @brief Construct a new Vec3 object with (0, 0, 0).
              */
@@ -42,7 +42,7 @@ namespace AGPTracer::Entities {
              *
              * @param values Array containing the three values of the vector.
              */
-            constexpr Vec3(std::array<T, 3> values);
+            constexpr explicit Vec3(std::array<T, 3> values);
 
             /**
              * @brief Construct a new Vec3 object from one value.
@@ -703,7 +703,7 @@ namespace AGPTracer::Entities {
              * @return true All two components of the vectors are approximately equal.
              * @return false At least one component of the vectors is not approximately equal.
              */
-            constexpr auto almost_equal(const Vec3<T>& other, const int ulp) const -> bool;
+            constexpr auto almost_equal(const Vec3<T>& other, int ulp) const -> bool;
     };
 }
 
@@ -730,7 +730,7 @@ auto operator<<(std::ostream& output, const AGPTracer::Entities::Vec3<T>& v) -> 
  * @return AGPTracer::Entities::Vec3 Resulting Vector, (a*x, a*y, a*z).
  */
 template<class T, class T2>
-constexpr auto operator*(const T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() * std::declval<T>())>;
+constexpr auto operator*(T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() * std::declval<T>())>;
 
 /**
  * @brief Divides a factor with a vector.
@@ -744,7 +744,7 @@ constexpr auto operator*(const T2 factor, const AGPTracer::Entities::Vec3<T>& v)
  * @return AGPTracer::Entities::Vec3 Resulting Vector, (a/x, a/y, a/z).
  */
 template<class T, class T2>
-constexpr auto operator/(const T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() / std::declval<T>())>;
+constexpr auto operator/(T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() / std::declval<T>())>;
 
 /**
  * @brief Adds a factor to a vector.
@@ -758,7 +758,7 @@ constexpr auto operator/(const T2 factor, const AGPTracer::Entities::Vec3<T>& v)
  * @return AGPTracer::Entities::Vec3 Resulting Vector, (a+x, a+y, a+z).
  */
 template<class T, class T2>
-constexpr auto operator+(const T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() + std::declval<T>())>;
+constexpr auto operator+(T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() + std::declval<T>())>;
 
 /**
  * @brief Subtracts a vector from a factor.
@@ -772,7 +772,7 @@ constexpr auto operator+(const T2 factor, const AGPTracer::Entities::Vec3<T>& v)
  * @return AGPTracer::Entities::Vec3 Resulting Vector, (a-x, a-y, a-z).
  */
 template<class T, class T2>
-constexpr auto operator-(const T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() - std::declval<T>())>;
+constexpr auto operator-(T2 factor, const AGPTracer::Entities::Vec3<T>& v) -> AGPTracer::Entities::Vec3<decltype(std::declval<T2>() - std::declval<T>())>;
 
 #include "entities/Vec3.tpp"
 

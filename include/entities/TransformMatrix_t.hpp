@@ -53,7 +53,7 @@ namespace AGPTracer::Entities {
              *
              * @param values Array containing the elements of the matrix, ordered by rows.
              */
-            constexpr TransformMatrix_t(std::array<T, 16> values);
+            constexpr explicit TransformMatrix_t(std::array<T, 16> values);
 
             std::array<T, 16> matrix_; /**< @brief Array of the 16 values in the 4x4 matrix.*/
             std::array<T, 16> matrix_inverse_; /**< @brief Transposed inverted matrix, used to transform directions.*/

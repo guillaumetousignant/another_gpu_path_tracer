@@ -15,7 +15,7 @@ namespace AGPTracer::Entities {
             /**
              * @brief Constructs a new RandomNumberGenerator_t object.
              */
-            constexpr RandomNumberGenerator_t(T seed) : state_{seed} {};
+            constexpr explicit RandomNumberGenerator_t(T seed) : state_{seed} {};
 
             /**
              * @brief Generates a random number.

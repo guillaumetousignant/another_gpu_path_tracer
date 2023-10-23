@@ -29,7 +29,7 @@ namespace AGPTracer::Entities {
              *
              * @param filename Path to a geometry file of either .obj or .su2 format.
              */
-            MeshGeometry_t(const std::filesystem::path& filename);
+            explicit MeshGeometry_t(const std::filesystem::path& filename);
 
             std::vector<Vec3<T>> nodes_; /**< @brief Array of nodes in the mesh.*/
             std::vector<Vec3<T>> normals_; /**< @brief Array of normals in the mesh.*/

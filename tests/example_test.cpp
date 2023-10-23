@@ -2,6 +2,7 @@
 #include <array>
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
+#include <numbers>
 #include <sycl/sycl.hpp>
 
 using AGPTracer::Entities::TransformMatrix_t;

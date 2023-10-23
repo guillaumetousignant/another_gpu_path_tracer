@@ -4,6 +4,7 @@
 #include "entities/Image.hpp"
 #include "entities/RandomGenerator_t.hpp"
 #include "entities/Resetable.hpp"
+#include "entities/Scene_t.hpp"
 #include "entities/Skybox.hpp"
 #include "entities/Updatable.hpp"
 #include "shapes/Triangle_t.hpp"
@@ -11,6 +12,7 @@
 #include <concepts>
 #include <filesystem>
 #include <random>
+
 
 namespace AGPTracer::Entities {
     /**

@@ -32,8 +32,8 @@ namespace AGPTracer::Shapes {
             Triangle_t(size_t material,
                        Entities::TransformMatrix_t<T> transform_matrix,
                        std::array<AGPTracer::Entities::Vec3<T>, 3> points,
-                       const std::optional<std::array<AGPTracer::Entities::Vec3<T>, 3>> normals,
-                       const std::optional<std::array<T, 6>> texcoord); // In c++26 sqrt is constexpr
+                       std::optional<std::array<AGPTracer::Entities::Vec3<T>, 3>> normals,
+                       std::optional<std::array<std::array<T, 2>, 3>> texcoord); // In c++26 sqrt is constexpr
 
             size_t material_; /**< @brief Material of which the shape is made of.*/
             AGPTracer::Entities::TransformMatrix_t<T> transformation_; /**< @brief Transformation matrix used to modify the position and other transformations of the shape.*/
@@ -41,8 +41,8 @@ namespace AGPTracer::Shapes {
                 points_orig_; /**< @brief Array of the three un-transformed points of the triangle, in counter-clockwise order. Transformed by the transform matrix on update to give points.*/
             std::array<AGPTracer::Entities::Vec3<T>, 3>
                 normals_orig_; /**< @brief Array of the three un-transformed normals of the triangle, in counter-clockwise order. Transformed by the transform matrix on update to give normals.*/
-            std::array<T, 6> texture_coordinates_; /**< @brief Array of the three texture coordinates with two components of the triangle, in counter-clockwise order. Transformed by the transform
-                                                           matrix on update to give texture coordinates. [x0, y0, x1, y1, x2, y2]*/
+            std::array<std::array<T, 2>, 3> texture_coordinates_; /**< @brief Array of the three texture coordinates with two components of the triangle, in counter-clockwise order. Transformed by the
+                                                           transform matrix on update to give texture coordinates. [[x0, y0], [x1, y1], [x2, y2]]*/
             std::array<AGPTracer::Entities::Vec3<T>, 3> points_; /**< @brief Array of the three points of the triangle, in counter-clockwise order.*/
             std::array<AGPTracer::Entities::Vec3<T>, 3> normals_; /**< @brief Array of the three  normals of the triangle, in counter-clockwise order.*/
             AGPTracer::Entities::Vec3<T> v0v1_; /**< @brief Cached vector from point 0 to point 1. Used for intersection.*/
