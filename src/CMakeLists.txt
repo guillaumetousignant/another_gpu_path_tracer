@@ -1,7 +1,9 @@
 add_library(AGPTracer INTERFACE)
 
+include(GNUInstallDirs)
+
 target_include_directories(AGPTracer INTERFACE 
-    $<INSTALL_INTERFACE:include/another_gpu_path_tracer/>    
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/another_gpu_path_tracer/>    
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>)
 
 option(USE_PNG "Use the PNG library to be able to read/write PNG images." ON)
@@ -50,21 +52,15 @@ endif()
 
 install(TARGETS AGPTracer
     EXPORT another_gpu_path_tracer-targets
-    DESTINATION lib)
+    DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_INSTALL_PREFIX)
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
-        DESTINATION include/another_gpu_path_tracer
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/another_gpu_path_tracer
         FILES_MATCHING
         PATTERN "*.h"
         PATTERN "*.hpp"
         PATTERN "*.tpp")
-endif()
-
-if(WIN32)
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/
-        DESTINATION bin
-        FILES_MATCHING PATTERN "*.dll")
 endif()
 
 install(EXPORT another_gpu_path_tracer-targets
@@ -73,7 +69,7 @@ install(EXPORT another_gpu_path_tracer-targets
     NAMESPACE
     AGPTracer::
     DESTINATION
-    lib/cmake/AGPTracer)
+    ${CMAKE_INSTALL_LIBDIR}/cmake/AGPTracer)
 
 # Create a ConfigVersion.cmake file
 include(CMakePackageConfigHelpers)
@@ -85,14 +81,14 @@ write_basic_package_version_file(
 
 configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/AGPTracerConfig.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/AGPTracerConfig.cmake
-    INSTALL_DESTINATION lib/cmake/AGPTracer
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/AGPTracer
 )
 
 # Install the config, configversion and custom find modules
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/AGPTracerConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/AGPTracerConfigVersion.cmake
-    DESTINATION lib/cmake/AGPTracer
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/AGPTracer
 )
 
 export(EXPORT another_gpu_path_tracer-targets
@@ -119,7 +115,13 @@ if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     set_property(TARGET another_gpu_path_tracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif()
 
-install(TARGETS another_gpu_path_tracer DESTINATION bin)
+install(TARGETS another_gpu_path_tracer DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+if(WIN32)
+    install(DIRECTORY $<TARGET_FILE_DIR:another_gpu_path_tracer>/
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        FILES_MATCHING PATTERN "*.dll")
+endif()
 
 if(USE_OpenSYCL)
     if(NOT DEFINED OPENSYCL_TARGETS) # "cuda:sm_61" for GTX 1070, "cuda:sm_75" for T200
