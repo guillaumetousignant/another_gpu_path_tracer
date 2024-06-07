@@ -123,16 +123,16 @@ if(WIN32)
         FILES_MATCHING PATTERN "*.dll")
 endif()
 
-if(USE_OpenSYCL)
-    if(NOT DEFINED OPENSYCL_TARGETS) # "cuda:sm_61" for GTX 1070, "cuda:sm_75" for T200
+if(USE_AdaptiveCpp)
+    if(NOT DEFINED ACPP_TARGETS) # "cuda:sm_61" for GTX 1070, "cuda:sm_75" for T200
         if (BUILD_CUDA)
-            set(OPENSYCL_TARGETS "cuda:sm_61")
+            set(ACPP_TARGETS "cuda:sm_61")
         else()
-            set(OPENSYCL_TARGETS "omp")
+            set(ACPP_TARGETS "omp")
         endif()
     endif()
 
-    find_package(OpenSYCL REQUIRED)
+    find_package(AdaptiveCpp REQUIRED)
     if(WIN32)
         target_compile_definitions(AGPTracer INTERFACE NOMINMAX)
         target_compile_definitions(AGPTracer INTERFACE -D_USE_MATH_DEFINES)

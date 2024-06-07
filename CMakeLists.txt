@@ -7,7 +7,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif()
 
 option(BUILD_CUDA "Build CUDA version of the targets." ON)
-option(USE_OpenSYCL "Use the Open SYCL backend." OFF)
+option(USE_AdaptiveCpp "Use the AdaptiveCpp backend." OFF)
 option(USE_clangSYCL "Use the Intel clang SYCL backend." OFF)
 option(USE_IPO "Use interprocedural optimization." OFF)
 
