@@ -104,16 +104,14 @@ template<typename T, template<typename> typename K, template<typename> typename 
 requires AGPTracer::Entities::Skybox<K, T>&& AGPTracer::Entities::Image<I, T> template<class R, template<typename> typename U, template<typename> typename S>
 requires AGPTracer::Entities::Shape<S, T> auto
 AGPTracer::Cameras::SphericalCamera_t<T, K, I, N>::accumulate(sycl::queue& queue, Entities::RandomGenerator_t<T, R, U>& random_generator, Entities::Scene_t<T, S>& scene, unsigned int n_iter) -> void {
-    unsigned int n = 0;
-    while (n < n_iter) {
-        ++n;
-
-        auto t_start = std::chrono::high_resolution_clock::now();
+    const auto t_start = std::chrono::high_resolution_clock::now();
+    for (unsigned int n = 0; n < n_iter; ++n){
         raytrace(queue, random_generator, scene);
-        auto t_end = std::chrono::high_resolution_clock::now();
-
-        std::cout << "Iteration " << n << " done in " << std::chrono::duration<T>(t_end - t_start).count() << "s." << std::endl;
     }
+    queue.wait();
+    const auto t_end = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Performed " << n_iter << " iterations in " << (std::chrono::duration<T>(t_end - t_start) / n_iter).count() << "s on average" << std::endl;
 }
 
 template<typename T, template<typename> typename K, template<typename> typename I, size_t N>
