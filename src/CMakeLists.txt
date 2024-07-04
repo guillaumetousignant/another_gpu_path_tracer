@@ -124,13 +124,7 @@ if(WIN32)
 endif()
 
 if(USE_AdaptiveCpp)
-    if(NOT DEFINED ACPP_TARGETS) # "cuda:sm_61" for GTX 1070, "cuda:sm_75" for T200
-        if (BUILD_CUDA)
-            set(ACPP_TARGETS "cuda:sm_61")
-        else()
-            set(ACPP_TARGETS "omp")
-        endif()
-    endif()
+    # ACPP_TARGETS should be "generic" for single-pass compiler, "omp" for explicit openmp, "cuda:sm_61" for GTX 1070, "cuda:sm_75" for T200
 
     find_package(AdaptiveCpp REQUIRED)
     if(WIN32)
