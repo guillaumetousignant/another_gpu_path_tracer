@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.28)
+# 3.28 enables C++ modules support
 # 3.20 enables removing the boost new version warning
 # 3.18 because that's the version on my raspberry pi
 
@@ -12,6 +13,8 @@ option(USE_clangSYCL "Use the Intel clang SYCL backend." OFF)
 option(USE_IPO "Use interprocedural optimization." OFF)
 
 project(SYCL_TEST VERSION 0.1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 

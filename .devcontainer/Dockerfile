@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/devcontainers/cpp:0-debian-11
 ARG REINSTALL_CMAKE_VERSION_FROM_SOURCE="3.29.6"
 ARG INSTALL_LLVM_VERSION="18"
 ARG INSTALL_ADAPTIVECPP_COMMIT="tags/v24.02.0"
+ARG REINSTALL_NINJA_VERSION_FROM_SOURCE="1.12.1"
 
 # Optionally install the cmake for vcpkg
 COPY ./reinstall-cmake.sh /tmp/
@@ -32,3 +33,10 @@ RUN if [ "${INSTALL_ADAPTIVECPP_COMMIT}" != "none" ]; then \
     chmod +x /tmp/install-adaptive-cpp.sh && /tmp/install-adaptive-cpp.sh ${INSTALL_ADAPTIVECPP_COMMIT}; \
     fi \
     && rm -f /tmp/install-adaptive-cpp.sh
+
+COPY ./reinstall-ninja.sh /tmp/
+
+RUN if [ "${REINSTALL_NINJA_VERSION_FROM_SOURCE}" != "none" ]; then \
+    chmod +x /tmp/reinstall-ninja.sh && /tmp/reinstall-ninja.sh ${REINSTALL_NINJA_VERSION_FROM_SOURCE}; \
+    fi \
+    && rm -f /tmp/reinstall-ninja.sh

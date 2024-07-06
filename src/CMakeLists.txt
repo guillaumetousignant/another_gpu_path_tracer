@@ -1,10 +1,12 @@
 add_library(AGPTracer INTERFACE)
 
-include(GNUInstallDirs)
-
-target_include_directories(AGPTracer INTERFACE 
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/another_gpu_path_tracer/>    
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/>)
+add_subdirectory(cameras)
+add_subdirectory(entities)
+add_subdirectory(images)
+add_subdirectory(materials)
+add_subdirectory(mediums)
+add_subdirectory(shapes)
+add_subdirectory(skyboxes)
 
 option(USE_PNG "Use the PNG library to be able to read/write PNG images." ON)
 if(USE_PNG)
@@ -50,17 +52,18 @@ if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     set_property(TARGET AGPTracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif()
 
+include(GNUInstallDirs)
+
 install(TARGETS AGPTracer
     EXPORT another_gpu_path_tracer-targets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    FILE_SET cxx_modules
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/another_gpu_path_tracer)
 
-if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_INSTALL_PREFIX)
-    install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/another_gpu_path_tracer
-        FILES_MATCHING
-        PATTERN "*.h"
-        PATTERN "*.hpp"
-        PATTERN "*.tpp")
+if(WIN32)
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        FILES_MATCHING PATTERN "*.dll")
 endif()
 
 install(EXPORT another_gpu_path_tracer-targets
@@ -104,24 +107,19 @@ add_executable(another_gpu_path_tracer
 target_link_libraries(another_gpu_path_tracer PRIVATE 
                                                 AGPTracer)
 
+target_compile_features(another_gpu_path_tracer PRIVATE cxx_std_20)
+
+if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
+    set_property(TARGET another_gpu_path_tracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+endif()
+
 if(OPTIMIZE_FOR_NATIVE)
     if(COMPILER_SUPPORTS_MARCH_NATIVE)
         target_compile_options(another_gpu_path_tracer PUBLIC -march=native)
     endif()
 endif()
 
-target_compile_features(another_gpu_path_tracer PRIVATE cxx_std_20)
-if(USE_IPO AND NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
-    set_property(TARGET another_gpu_path_tracer PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
-endif()
-
 install(TARGETS another_gpu_path_tracer DESTINATION ${CMAKE_INSTALL_BINDIR})
-
-if(WIN32)
-    install(DIRECTORY $<TARGET_FILE_DIR:another_gpu_path_tracer>/
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-        FILES_MATCHING PATTERN "*.dll")
-endif()
 
 if(USE_AdaptiveCpp)
     # ACPP_TARGETS should be "generic" for single-pass compiler, "omp" for explicit openmp, "cuda:sm_61" for GTX 1070, "cuda:sm_75" for T200
