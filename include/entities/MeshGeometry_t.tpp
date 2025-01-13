@@ -27,7 +27,6 @@ auto AGPTracer::Entities::MeshGeometry_t<T>::readObj(const std::filesystem::path
     size_t nf  = 0;
     unsigned int nsides;
     std::string line;
-    std::string token;
     std::string dummy;
 
     std::ifstream meshfile(filename);
@@ -38,19 +37,23 @@ auto AGPTracer::Entities::MeshGeometry_t<T>::readObj(const std::filesystem::path
 
     // Getting number of elements
     while (std::getline(meshfile, line)) {
-        std::istringstream liness(line);
-        liness >> token;
+        if (line.length() < 3) {
+            continue;
+        }
 
-        if (token == "v") {
+        if (line[0] == 'v' && line[1] == ' ') {
             ++nv;
         }
-        else if (token == "vt") {
+        else if (line[0] == 'v' && line[1] == 't' && line[2] == ' ') {
             ++nvt;
         }
-        else if (token == "vn") {
+        else if (line[0] == 'v' && line[1] == 'n' && line[2] == ' ') {
             ++nvn;
         }
-        else if (token == "f") {
+        else if (line[0] == 'f' && line[1] == ' ') {
+            std::istringstream liness(line);
+            liness >> dummy;
+
             nsides = 0;
             while (liness >> dummy) {
                 ++nsides;
@@ -75,21 +78,28 @@ auto AGPTracer::Entities::MeshGeometry_t<T>::readObj(const std::filesystem::path
     meshfile.seekg(0, std::ios::beg);
 
     while (std::getline(meshfile, line)) {
-        std::istringstream liness(line);
-        liness >> token;
+        if (line.length() < 3) {
+            continue;
+        }
 
-        if (token == "v") {
-            liness >> val0 >> val1 >> val2;
+        if (line[0] == 'v' && line[1] == ' ') {
+            std::istringstream liness(line);
+
+            liness >> dummy >> val0 >> val1 >> val2;
             nodes_[v_counter] = AGPTracer::Entities::Vec3<T>(val0, val1, val2);
             ++v_counter;
         }
-        else if (token == "vt") {
-            liness >> val0 >> val1;
+        else if (line[0] == 'v' && line[1] == 't' && line[2] == ' ') {
+            std::istringstream liness(line);
+
+            liness >> dummy >> val0 >> val1;
             texture_coordinates_[vt_counter] = {val0, val1};
             ++vt_counter;
         }
-        else if (token == "vn") {
-            liness >> val0 >> val1 >> val2;
+        else if (line[0] == 'v' && line[1] == 'n' && line[2] == ' ') {
+            std::istringstream liness(line);
+
+            liness >> dummy >> val0 >> val1 >> val2;
             normals_[vn_counter] = AGPTracer::Entities::Vec3<T>(val0, val1, val2);
             ++vn_counter;
         }
@@ -114,29 +124,41 @@ auto AGPTracer::Entities::MeshGeometry_t<T>::readObj(const std::filesystem::path
     meshfile.seekg(0, std::ios::beg);
 
     while (std::getline(meshfile, line)) {
-        std::istringstream liness(line);
-        liness >> token;
-        if (token == "f") {
-            liness >> tokens[0] >> tokens[1];
+        if (line.length() < 3) {
+            continue;
+        }
+
+        if (line[0] == 'f' && line[1] == ' ') {
+            std::istringstream liness(line);
+            liness >> dummy >> tokens[0] >> tokens[1];
             while (liness >> tokens[2]) {
                 for (unsigned int i = 0; i < 3; ++i) {
                     value           = tokens[i];
                     mat_[f_counter] = material;
                     pos             = value.find('/');
                     if (pos == std::string::npos) {
-                        face_nodes_[f_counter][i]                 = std::stoi(value, nullptr) - 1;
+                        const long long node_obj_index = std::stoll(value, nullptr);
+                        const size_t node_index        = (node_obj_index > 0) ? node_obj_index - 1 : nodes_.size() + node_obj_index;
+
+                        face_nodes_[f_counter][i]                 = node_index;
                         face_texture_coordinates_[f_counter][i]   = static_cast<size_t>(-1);
                         face_normals_[f_counter][i]               = static_cast<size_t>(-1);
                         missing_normals[f_counter][i]             = true;
                         missing_texture_coordinates[f_counter][i] = true;
                     }
                     else {
-                        face_nodes_[f_counter][i] = std::stoi(value.substr(0, pos), nullptr) - 1;
+                        const long long node_obj_index = std::stoll(value.substr(0, pos), nullptr);
+                        const size_t node_index        = (node_obj_index > 0) ? node_obj_index - 1 : nodes_.size() + node_obj_index;
+
+                        face_nodes_[f_counter][i] = node_index;
                         value.erase(0, pos + 1);
 
                         pos = value.find('/');
                         if (pos == std::string::npos) {
-                            face_texture_coordinates_[f_counter][i]   = std::stoi(value, nullptr) - 1;
+                            const long long texture_coordinate_obj_index = std::stoll(value, nullptr);
+                            const size_t texture_coordinate_index = (texture_coordinate_obj_index > 0) ? texture_coordinate_obj_index - 1 : texture_coordinates_.size() + texture_coordinate_obj_index;
+
+                            face_texture_coordinates_[f_counter][i]   = texture_coordinate_index;
                             face_normals_[f_counter][i]               = static_cast<size_t>(-1);
                             missing_normals[f_counter][i]             = true;
                             missing_texture_coordinates[f_counter][i] = false;
@@ -147,11 +169,19 @@ auto AGPTracer::Entities::MeshGeometry_t<T>::readObj(const std::filesystem::path
                                 missing_texture_coordinates[f_counter][i] = true;
                             }
                             else {
-                                face_texture_coordinates_[f_counter][i]   = std::stoi(value.substr(0, pos), nullptr) - 1;
+                                const long long texture_coordinate_obj_index = std::stoll(value.substr(0, pos), nullptr);
+                                const size_t texture_coordinate_index =
+                                    (texture_coordinate_obj_index > 0) ? texture_coordinate_obj_index - 1 : texture_coordinates_.size() + texture_coordinate_obj_index;
+
+                                face_texture_coordinates_[f_counter][i]   = texture_coordinate_index;
                                 missing_texture_coordinates[f_counter][i] = false;
                             }
                             value.erase(0, pos + 1);
-                            face_normals_[f_counter][i]   = std::stoi(value, nullptr) - 1;
+
+                            const long long normal_obj_index = std::stoll(value, nullptr);
+                            const size_t normal_index        = (normal_obj_index > 0) ? normal_obj_index - 1 : normals_.size() + normal_obj_index;
+
+                            face_normals_[f_counter][i]   = normal_index;
                             missing_normals[f_counter][i] = false;
                         }
                     }
@@ -160,8 +190,9 @@ auto AGPTracer::Entities::MeshGeometry_t<T>::readObj(const std::filesystem::path
                 tokens[1] = tokens[2];
             }
         }
-        else if (token == "usemtl") { // check if there is :
-            liness >> tokens[0];
+        else if (line.length() > 7 && line[0] == 'u' && line[1] == 's' && line[2] == 'e' && line[3] == 'm' && line[4] == 't' && line[5] == 'l' && line[6] == ' ') { // check if there is :
+            std::istringstream liness(line);
+            liness >> dummy >> tokens[0];
             pos = tokens[0].find(':');
             if (pos != std::string::npos) {
                 tokens[0].erase(0, pos + 1);
